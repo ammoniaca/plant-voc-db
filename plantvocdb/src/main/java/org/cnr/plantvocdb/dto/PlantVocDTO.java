@@ -1,11 +1,18 @@
 package org.cnr.plantvocdb.dto;
 
+import lombok.*;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsRanks;
 
 import java.time.OffsetDateTime;
 import java.util.Set;
 
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class PlantVocDTO {
 
     private String IpniCode;
@@ -22,7 +29,5 @@ public class PlantVocDTO {
     private Set<PlantEmitterDTO> emitter;
     private OffsetDateTime createdDatetimeUTC;
     private OffsetDateTime updatedDatetimeUTC;
-
-
 
 }
