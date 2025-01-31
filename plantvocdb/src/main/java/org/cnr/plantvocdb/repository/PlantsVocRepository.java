@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface PlantVocRepository
+public interface PlantsVocRepository
         extends JpaRepository<PlantVocEntity, UUID> {
 }
