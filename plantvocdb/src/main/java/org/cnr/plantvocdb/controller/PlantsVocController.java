@@ -43,12 +43,12 @@ public class PlantsVocController {
     public ResponseEntity<?> createPlant(
             @RequestBody
             @Valid
-            RequestPlantVocDTO plant
+            RequestPlantVocDTO plantDTO
     ){
         System.out.println("ciao");
-        // String name = plant.getName();
+        String name = plantDTO.getName();
 
-        ResponsePlantVocDTO newPlant = this.service.CreateNewPlantVoc(plant);
+        ResponsePlantVocDTO newPlant = service.CreateNewPlantVoc(plantDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(newPlant);

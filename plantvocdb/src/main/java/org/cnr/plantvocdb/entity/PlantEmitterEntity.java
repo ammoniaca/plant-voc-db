@@ -10,14 +10,14 @@ public class PlantEmitterEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean emitter;
+    private boolean emits;
 
     private String doi;
 
     @ManyToOne
-    @JoinColumn(name = "plant_voc_id")
+    @JoinColumn(name = "fk_plant_id")
+    // @CollectionTable(name = "emitter", joinColumns = @JoinColumn(name = "fk_plant_id"))
     private PlantVocEntity plantVocEntity;
-
 
     public Long getId() {
         return id;
@@ -27,12 +27,12 @@ public class PlantEmitterEntity {
         this.id = id;
     }
 
-    public boolean isEmitter() {
-        return emitter;
+    public boolean getEmits() {
+        return emits;
     }
 
-    public void setEmitter(boolean emitter) {
-        this.emitter = emitter;
+    public void setEmits(boolean emitter) {
+        this.emits = emitter;
     }
 
     public String getDoi() {

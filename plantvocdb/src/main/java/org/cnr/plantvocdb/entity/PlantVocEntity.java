@@ -1,6 +1,7 @@
 package org.cnr.plantvocdb.entity;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ import org.cnr.plantvocdb.enums.PlantsRanks;
 @Builder
 @Table(name = "plants_voc")
 @Setter(AccessLevel.NONE)
+@Getter(AccessLevel.NONE)
 public class PlantVocEntity {
 
     @Id
@@ -55,12 +57,16 @@ public class PlantVocEntity {
     @Enumerated(EnumType.STRING)
     private LeafHabitus leafHabitus;
 
-    @OneToMany(mappedBy = "plantVocEntity")
-    private Set<PlantEmitterEntity> emitter;
+    @OneToMany(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.ALL},
+            mappedBy = "plantVocEntity"
+    )
+    private Set<PlantEmitterEntity> emitter = new HashSet<>();
 
-    @ElementCollection
-    @Column(name="synonyms")
-    private Set<String> synonyms;
+//    @ElementCollection
+//    @Column(name="synonyms")
+//    private Set<String> synonyms = new HashSet<>();
 
     @Column(name="created_datetime_utc", updatable = false) // creation_datetime_utc
     private OffsetDateTime createdDatetimeUTC;
@@ -165,13 +171,13 @@ public class PlantVocEntity {
         this.emitter = emitter;
     }
 
-    public Set<String> getSynonyms() {
-        return synonyms;
-    }
-
-    public void setSynonyms(Set<String> synonyms) {
-        this.synonyms = synonyms;
-    }
+//    public Set<String> getSynonyms() {
+//        return synonyms;
+//    }
+//
+//    public void setSynonyms(Set<String> synonyms) {
+//        this.synonyms = synonyms;
+//    }
 
     public OffsetDateTime getCreatedDatetimeUTC() {
         return createdDatetimeUTC;

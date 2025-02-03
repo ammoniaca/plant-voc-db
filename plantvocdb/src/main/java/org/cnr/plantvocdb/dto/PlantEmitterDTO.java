@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class PlantEmitterDTO {
 
-    private boolean emitter;
+    private boolean emits;
     private String doi;
 
 }

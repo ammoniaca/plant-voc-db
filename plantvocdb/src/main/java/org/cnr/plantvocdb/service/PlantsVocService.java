@@ -25,17 +25,20 @@ public class PlantsVocService {
 
     }
 
-    public ResponsePlantVocDTO CreateNewPlantVoc(RequestPlantVocDTO plant){
+    public ResponsePlantVocDTO CreateNewPlantVoc(RequestPlantVocDTO plantDTO){
 
         // map DTO to Entity
-        PlantVocEntity plantEntity = this.mapper.map(plant, PlantVocEntity.class);
+        PlantVocEntity plantEntity = mapper.map(plantDTO, PlantVocEntity.class);
 
         // set datetime in UTC
         OffsetDateTime odt = OffsetDateTime.now(ZoneOffset.UTC);
         plantEntity.setCreatedDatetimeUTC(odt);
         plantEntity.setUpdatedDatetimeUTC(odt);
 
-        //
+        // save new plant in DB
+        PlantVocEntity savedPlantEntity = this.repository.save(plantEntity);
+
+        // map Entity to DTO
 
         return null;
     }
