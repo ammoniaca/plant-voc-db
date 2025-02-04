@@ -53,4 +53,5 @@ public class RequestPlantVocDTO {
     @JsonProperty("emitter")
     private Set<PlantEmitterDTO> emitter;
 
+
 }
