@@ -1,6 +1,5 @@
 package org.cnr.plantvocdb.service;
 
-import org.cnr.plantvocdb.dto.PlantEmitterDTO;
 import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
@@ -44,6 +43,26 @@ public class PlantsVocService {
     }
 
 
+    public List<PlantInfoDTO> getAllFullEmitter(){
+        List<PlantVocEntity> plantsEntity = repository
+                .findAll()
+                .stream()
+                .toList();
+
+        List<PlantInfoDTO> infoDTOList = new ArrayList<>();
+        for (PlantVocEntity plant : plantsEntity) {
+            if(this.isFullEmitter(plant)){
+                infoDTOList.add(PlantInfoDTO
+                        .builder()
+                        .id(plant.getId())
+                        .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
+                        .build());
+            };
+        }
+        return infoDTOList;
+
+    }
+
 
     public List<ResponsePlantVocDTO> getAll() {
         // get all plants stored in the DB
@@ -79,5 +98,15 @@ public class PlantsVocService {
         return mapper.map(savedPlantEntity, ResponsePlantVocDTO.class);
     }
 
+    public Boolean isFullEmitter(PlantVocEntity plantVocEntity){
+
+        List<Boolean> boolList = plantVocEntity
+                .getEmitter()
+                .stream()
+                .map(PlantEmitterEntity::isEmits)
+                .toList();
+        return boolList.stream().allMatch(b -> b);
+
+    }
 
 }

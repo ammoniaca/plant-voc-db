@@ -79,12 +79,6 @@ public class PlantVocEntity {
     @Column(name="updated_datetime_utc")  // last_modified_datetime_utc
     private OffsetDateTime updatedDatetimeUTC;
 
-//    void addPlantEmitterEntity(PlantEmitterEntity emitterEntity) {
-//        emitterEntity.setPlant(this);
-//        emitter.add(emitterEntity);
-//    }
-
-
     public void setName(String name) {
 
         this.name = StringUtils

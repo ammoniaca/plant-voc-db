@@ -37,7 +37,6 @@ public class PlantsVocController {
     }
 
 
-
     @GetMapping(
             value = "/plant",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -45,6 +44,15 @@ public class PlantsVocController {
     public List<PlantInfoDTO> getPlantsVocInfo(){
     return service.getInfo();
     }
+
+    @GetMapping(
+            value = "/plant/emitter",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<PlantInfoDTO> getPlantsFullEmitter(){
+        return service.getAllFullEmitter();
+    }
+
 
     @PostMapping(
             value = "/plant",
