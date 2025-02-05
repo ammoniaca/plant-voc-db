@@ -1,12 +1,12 @@
 package org.cnr.plantvocdb.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsRanks;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,7 +29,6 @@ public class ResponsePlantVocDTO {
     @JsonProperty("fullNameNoAuthors")
     private String fullNameNoAuthorsPlain;
 
-    @NotEmpty(message = "Plant name cannot be empty.")
     @JsonProperty("name")
     private String name;
 
@@ -55,13 +54,12 @@ public class ResponsePlantVocDTO {
     private Set<String> synonyms;
 
     @JsonProperty("emitter")
-    private Set<PlantEmitterDTO> emitter;
+    private List<PlantEmitterDTO> emitter;
 
     @JsonProperty("created")
     private OffsetDateTime createdDatetimeUTC;
 
     @JsonProperty("updated")
-    private OffsetDateTime modifiedDatetimeUTC;
-
+    private OffsetDateTime updatedDatetimeUTC;
 
 }

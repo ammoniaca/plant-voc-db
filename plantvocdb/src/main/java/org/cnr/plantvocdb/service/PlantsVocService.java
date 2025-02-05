@@ -1,7 +1,10 @@
 package org.cnr.plantvocdb.service;
 
+import org.cnr.plantvocdb.dto.PlantEmitterDTO;
+import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
+import org.cnr.plantvocdb.entity.PlantEmitterEntity;
 import org.cnr.plantvocdb.entity.PlantVocEntity;
 import org.cnr.plantvocdb.repository.PlantsVocRepository;
 import org.modelmapper.ModelMapper;
@@ -10,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class PlantsVocService {
@@ -25,6 +31,34 @@ public class PlantsVocService {
 
     }
 
+    public List<PlantInfoDTO> getInfo() {
+        List<PlantVocEntity> plantsEntity = repository
+                .findAll()
+                .stream()
+                .toList();
+
+        return plantsEntity
+                .stream()
+                .map(it -> mapper.map(it, PlantInfoDTO.class))
+                .toList();
+    }
+
+
+
+    public List<ResponsePlantVocDTO> getAll() {
+        // get all plants stored in the DB
+        List<PlantVocEntity> plantsEntity = repository
+                .findAll()
+                .stream()
+                .toList();
+
+        return plantsEntity
+                .stream()
+                .map(it -> mapper.map(it, ResponsePlantVocDTO.class))
+                .toList();
+    }
+
+
     public ResponsePlantVocDTO CreateNewPlantVoc(RequestPlantVocDTO plantDTO){
 
         // map DTO to Entity
@@ -35,12 +69,14 @@ public class PlantsVocService {
         plantEntity.setCreatedDatetimeUTC(odt);
         plantEntity.setUpdatedDatetimeUTC(odt);
 
+        // iterate over the set to add plantEntity
+        plantEntity.getEmitter().forEach(it -> it.setPlant(plantEntity));
+
         // save new plant in DB
-        PlantVocEntity savedPlantEntity = this.repository.save(plantEntity);
+        PlantVocEntity savedPlantEntity = repository.save(plantEntity);
 
         // map Entity to DTO
-
-        return null;
+        return mapper.map(savedPlantEntity, ResponsePlantVocDTO.class);
     }
 
 

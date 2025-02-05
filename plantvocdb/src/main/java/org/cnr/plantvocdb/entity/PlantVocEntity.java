@@ -1,7 +1,6 @@
 package org.cnr.plantvocdb.entity;
 
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.*;
@@ -22,15 +21,17 @@ public class PlantVocEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name="id", length = 36, nullable = false, updatable = false)
+    @Column(name="id", length = 50, nullable = false, updatable = false)
     private UUID id;
 
     @Column(name="ipni", length = 50)
     private String ipni;
 
+    @Setter(AccessLevel.NONE)
     @Column(name="full_name_plain", length = 50)
     private String fullNamePlain;
 
+    @Setter(AccessLevel.NONE)
     @Column(name="full_name_no_authors_plain", length = 50)
     private String fullNameNoAuthorsPlain;
 
@@ -63,7 +64,7 @@ public class PlantVocEntity {
 
     @OneToMany(
             fetch = FetchType.EAGER,
-            cascade = {CascadeType.ALL},
+            cascade = CascadeType.ALL,
             mappedBy = "plant"
     )
     private Set<PlantEmitterEntity> emitter;
@@ -78,24 +79,45 @@ public class PlantVocEntity {
     @Column(name="updated_datetime_utc")  // last_modified_datetime_utc
     private OffsetDateTime updatedDatetimeUTC;
 
+//    void addPlantEmitterEntity(PlantEmitterEntity emitterEntity) {
+//        emitterEntity.setPlant(this);
+//        emitter.add(emitterEntity);
+//    }
+
+
     public void setName(String name) {
 
-        this.name = name.toLowerCase();
+        this.name = StringUtils
+                .normalizeSpace(name.toLowerCase());
     }
 
     public void setFamily(String family) {
 
-        this.family = StringUtils.capitalize(family.toLowerCase());
+        this.family = StringUtils
+                .normalizeSpace(StringUtils
+                        .capitalize(family.toLowerCase()));
     }
 
     public void setGenus(String genus) {
 
-        this.genus = StringUtils.capitalize(genus.toLowerCase());
+        this.genus = StringUtils
+                .normalizeSpace(StringUtils
+                        .capitalize(genus.toLowerCase()));
     }
 
     public void setSpecies(String species) {
 
-        this.species = species.toLowerCase();
+        this.species = StringUtils
+                .normalizeSpace(species.toLowerCase());
     }
 
+    public void setFullNamePlain(String fullNamePlain) {
+        this.fullNamePlain = StringUtils
+                .normalizeSpace(fullNamePlain);
+    }
+
+    public void setFullNameNoAuthorsPlain(String fullNameNoAuthorsPlain) {
+        this.fullNameNoAuthorsPlain = StringUtils
+                .normalizeSpace(fullNameNoAuthorsPlain);
+    }
 }

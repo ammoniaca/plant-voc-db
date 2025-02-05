@@ -11,7 +11,7 @@ public interface PlantsVocRepository
         extends JpaRepository<PlantVocEntity, UUID> {
 
 
-    PlantVocEntity save(PlantVocEntity plant);
+    //PlantVocEntity save(PlantVocEntity plant);
 
 
 }

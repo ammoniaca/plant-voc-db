@@ -1,6 +1,7 @@
 package org.cnr.plantvocdb.controller;
 
 import jakarta.validation.Valid;
+import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
 import org.cnr.plantvocdb.service.PlantsVocService;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/voc")
@@ -34,6 +37,14 @@ public class PlantsVocController {
     }
 
 
+
+    @GetMapping(
+            value = "/plant",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<PlantInfoDTO> getPlantsVocInfo(){
+    return service.getInfo();
+    }
 
     @PostMapping(
             value = "/plant",
