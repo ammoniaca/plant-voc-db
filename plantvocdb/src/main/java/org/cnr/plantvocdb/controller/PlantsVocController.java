@@ -36,26 +36,41 @@ public class PlantsVocController {
 
     }
 
-
     @GetMapping(
-            value = "/plant",
+            value = "/plants",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<PlantInfoDTO> getPlantsVocInfo(){
-    return service.getInfo();
+        return service.getAllPlantsInfo();
     }
 
     @GetMapping(
-            value = "/plant/emitter",
+            value = "/plants/always-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<PlantInfoDTO> getPlantsFullEmitter(){
-        return service.getAllFullEmitter();
+    public List<PlantInfoDTO> getPlantsAlwaysEmitter(){
+        return service.getAlwaysEmitters();
+    }
+
+    @GetMapping(
+            value = "/plants/never-emitters",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<PlantInfoDTO> getPlantsNeverEmitter(){
+        return service.getNeverEmitters();
+    }
+
+    @GetMapping(
+            value = "/plants/mixed-emitters",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<PlantInfoDTO> getPlantsMixedEmitter(){
+        return service.getMixedEmitters();
     }
 
 
     @PostMapping(
-            value = "/plant",
+            value = "/plants",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -72,8 +87,5 @@ public class PlantsVocController {
                 .status(HttpStatus.CREATED)
                 .body(newPlant);
     }
-
-
-
 
 }

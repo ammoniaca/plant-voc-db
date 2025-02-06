@@ -14,7 +14,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class PlantsVocService {
@@ -30,7 +29,7 @@ public class PlantsVocService {
 
     }
 
-    public List<PlantInfoDTO> getInfo() {
+    public List<PlantInfoDTO> getAllPlantsInfo() {
         List<PlantVocEntity> plantsEntity = repository
                 .findAll()
                 .stream()
@@ -43,36 +42,53 @@ public class PlantsVocService {
     }
 
 
-    public List<PlantInfoDTO> getAllFullEmitter(){
-        List<PlantVocEntity> plantsEntity = repository
-                .findAll()
-                .stream()
-                .toList();
-
-        List<PlantInfoDTO> infoDTOList = new ArrayList<>();
-        for (PlantVocEntity plant : plantsEntity) {
-            if(this.isFullEmitter(plant)){
-                infoDTOList.add(PlantInfoDTO
+    public List<PlantInfoDTO> getAlwaysEmitters(){
+        List<PlantInfoDTO> PlantInfoDTOList = new ArrayList<>();
+        for (PlantVocEntity plant : getAllEntity()) {
+            if(this.isAlwaysEmitter(plant)){
+                PlantInfoDTOList.add(PlantInfoDTO
                         .builder()
                         .id(plant.getId())
                         .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
                         .build());
             };
         }
-        return infoDTOList;
+        return PlantInfoDTOList;
 
+    }
+
+    public List<PlantInfoDTO> getNeverEmitters(){
+        List<PlantInfoDTO> PlantInfoDTOList = new ArrayList<>();
+        for (PlantVocEntity plant : getAllEntity()) {
+            if(this.isNeverEmitter(plant)){
+                PlantInfoDTOList.add(PlantInfoDTO
+                        .builder()
+                        .id(plant.getId())
+                        .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
+                        .build());
+            };
+        }
+        return PlantInfoDTOList;
+    }
+
+    public List<PlantInfoDTO> getMixedEmitters(){
+        List<PlantInfoDTO> PlantInfoDTOList = new ArrayList<>();
+        for (PlantVocEntity plant : getAllEntity()) {
+            if(this.isMixedEmitter(plant)){
+                PlantInfoDTOList.add(PlantInfoDTO
+                        .builder()
+                        .id(plant.getId())
+                        .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
+                        .build());
+            }
+        };
+        return PlantInfoDTOList;
     }
 
 
     public List<ResponsePlantVocDTO> getAll() {
-        // get all plants stored in the DB
-        List<PlantVocEntity> plantsEntity = repository
-                .findAll()
-                .stream()
-                .toList();
-
-        return plantsEntity
-                .stream()
+        // get all Entity stored in the DB and map DTO
+        return getAllEntity().stream()
                 .map(it -> mapper.map(it, ResponsePlantVocDTO.class))
                 .toList();
     }
@@ -98,7 +114,7 @@ public class PlantsVocService {
         return mapper.map(savedPlantEntity, ResponsePlantVocDTO.class);
     }
 
-    public Boolean isFullEmitter(PlantVocEntity plantVocEntity){
+    private Boolean isAlwaysEmitter(PlantVocEntity plantVocEntity){
 
         List<Boolean> boolList = plantVocEntity
                 .getEmitter()
@@ -108,5 +124,39 @@ public class PlantsVocService {
         return boolList.stream().allMatch(b -> b);
 
     }
+
+    private Boolean isNeverEmitter(PlantVocEntity plantVocEntity){
+
+        List<Boolean> boolList = plantVocEntity
+                .getEmitter()
+                .stream()
+                .map(PlantEmitterEntity::isEmits)
+                .toList();
+        return boolList.stream().noneMatch(b -> b);
+
+    }
+
+    private Boolean isMixedEmitter(PlantVocEntity plantVocEntity){
+        List<Boolean> boolList = plantVocEntity
+                .getEmitter()
+                .stream()
+                .map(PlantEmitterEntity::isEmits)
+                .toList();
+        boolean flag = false;
+        if(boolList.size() != 1) {
+            flag = boolList.stream().distinct().count() == 1;
+        }
+        return flag;
+
+    }
+
+    private List<PlantVocEntity> getAllEntity(){
+        return repository
+                .findAll()
+                .stream()
+                .toList();
+    }
+
+
 
 }
