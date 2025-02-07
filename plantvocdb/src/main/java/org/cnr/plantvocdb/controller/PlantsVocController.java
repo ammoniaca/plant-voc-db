@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/voc")
@@ -24,17 +26,14 @@ public class PlantsVocController {
 
     @Autowired
     public PlantsVocController(PlantsVocService service) {
+
         this.service = service;
     }
 
 
-    @GetMapping(
-            value = "/hello"
-    )
-    public String getHello(){
-        return "Hello World";
-
-    }
+    /*
+     * GETs
+     * */
 
     @GetMapping(
             value = "/plants",
@@ -44,6 +43,43 @@ public class PlantsVocController {
         return service.getAllPlantsInfo();
     }
 
+    /**
+     * Get Plant Voc by ID
+     */
+    @GetMapping(
+            value = "/plants/id/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> getPlantById(@PathVariable("id") UUID id){
+        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.getPlantById(id);
+        return optionalResponsePlantVocDTO.map(
+                responsePlantVocDTO -> ResponseEntity
+                .status(HttpStatus.FOUND)
+                .body(responsePlantVocDTO))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Get Plant Voc by IPNI (International Plant Names Index) code
+     */
+    @GetMapping(
+            value = "/plants/ipni/{ipni}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> getPlantByIpni(@PathVariable("ipni") String ipni){
+        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.getPlantByIpni(ipni);
+        return optionalResponsePlantVocDTO.map(
+                        responsePlantVocDTO -> ResponseEntity
+                                .status(HttpStatus.FOUND)
+                                .body(responsePlantVocDTO))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+
+    /**
+     * Get List of Plant always emitters (i.e.,always true)
+     */
     @GetMapping(
             value = "/plants/always-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -52,6 +88,9 @@ public class PlantsVocController {
         return service.getAlwaysEmitters();
     }
 
+    /**
+     * Get List of Plant never emitters (i.e., always false)
+     */
     @GetMapping(
             value = "/plants/never-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -60,6 +99,9 @@ public class PlantsVocController {
         return service.getNeverEmitters();
     }
 
+    /**
+     * Get List of Plant mixed emitters (i.e., sometimes true and sometimes false)
+     */
     @GetMapping(
             value = "/plants/mixed-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -68,13 +110,16 @@ public class PlantsVocController {
         return service.getMixedEmitters();
     }
 
+    /*
+    * POSTs
+    * */
 
     @PostMapping(
             value = "/plants",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> createPlant(
+    public ResponseEntity<?> postNewPlant(
             @RequestBody
             @Valid
             RequestPlantVocDTO plantDTO
@@ -82,7 +127,7 @@ public class PlantsVocController {
         System.out.println("ciao");
         String name = plantDTO.getName();
 
-        ResponsePlantVocDTO newPlant = service.CreateNewPlantVoc(plantDTO);
+        ResponsePlantVocDTO newPlant = service.createPlantVoc(plantDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(newPlant);

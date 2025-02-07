@@ -14,6 +14,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PlantsVocService {
@@ -41,6 +43,25 @@ public class PlantsVocService {
                 .toList();
     }
 
+    public Optional<ResponsePlantVocDTO> getPlantById(UUID id) {
+        Optional<PlantVocEntity> optionalPlantEntity = repository.findById(id);
+        if(optionalPlantEntity.isPresent()) {
+            ResponsePlantVocDTO responsePlantDTO = mapper.map(optionalPlantEntity.get(), ResponsePlantVocDTO.class);
+            return Optional.of(responsePlantDTO);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<ResponsePlantVocDTO> getPlantByIpni(String ipni){
+        Optional<PlantVocEntity> optionalPlantEntity = repository.findByIpni(ipni);
+        return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantVocDTO.class));
+
+//        if(optionalPlantEntity.isPresent()) {
+//            ResponsePlantVocDTO responsePlantVocDTO = mapper.map(optionalPlantEntity.get(), ResponsePlantVocDTO.class);
+//            return Optional.of(responsePlantVocDTO);
+//        }
+//        return Optional.empty();
+    }
 
     public List<PlantInfoDTO> getAlwaysEmitters(){
         List<PlantInfoDTO> PlantInfoDTOList = new ArrayList<>();
@@ -85,7 +106,6 @@ public class PlantsVocService {
         return PlantInfoDTOList;
     }
 
-
     public List<ResponsePlantVocDTO> getAll() {
         // get all Entity stored in the DB and map DTO
         return getAllEntity().stream()
@@ -93,8 +113,7 @@ public class PlantsVocService {
                 .toList();
     }
 
-
-    public ResponsePlantVocDTO CreateNewPlantVoc(RequestPlantVocDTO plantDTO){
+    public ResponsePlantVocDTO createPlantVoc(RequestPlantVocDTO plantDTO){
 
         // map DTO to Entity
         PlantVocEntity plantEntity = mapper.map(plantDTO, PlantVocEntity.class);
