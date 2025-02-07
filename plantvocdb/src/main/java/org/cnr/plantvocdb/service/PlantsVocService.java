@@ -45,22 +45,21 @@ public class PlantsVocService {
 
     public Optional<ResponsePlantVocDTO> getPlantById(UUID id) {
         Optional<PlantVocEntity> optionalPlantEntity = repository.findById(id);
-        if(optionalPlantEntity.isPresent()) {
-            ResponsePlantVocDTO responsePlantDTO = mapper.map(optionalPlantEntity.get(), ResponsePlantVocDTO.class);
-            return Optional.of(responsePlantDTO);
-        }
-        return Optional.empty();
+        return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantVocDTO.class));
     }
 
     public Optional<ResponsePlantVocDTO> getPlantByIpni(String ipni){
         Optional<PlantVocEntity> optionalPlantEntity = repository.findByIpni(ipni);
         return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantVocDTO.class));
+    }
 
-//        if(optionalPlantEntity.isPresent()) {
-//            ResponsePlantVocDTO responsePlantVocDTO = mapper.map(optionalPlantEntity.get(), ResponsePlantVocDTO.class);
-//            return Optional.of(responsePlantVocDTO);
-//        }
-//        return Optional.empty();
+    public List<ResponsePlantVocDTO> getPlantsByName(String name){
+        // sanitize name (i.e., lower case)
+        return repository
+                .findByName(name.toLowerCase())
+                .stream()
+                .map(it -> mapper.map(it, ResponsePlantVocDTO.class))
+                .toList();
     }
 
     public List<PlantInfoDTO> getAlwaysEmitters(){

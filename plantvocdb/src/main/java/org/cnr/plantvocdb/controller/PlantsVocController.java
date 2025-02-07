@@ -32,8 +32,8 @@ public class PlantsVocController {
 
 
     /*
-     * GETs
-     * */
+     * Endpoints GET
+     */
 
     @GetMapping(
             value = "/plants",
@@ -75,6 +75,19 @@ public class PlantsVocController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping(
+            value = "/plants/name/{name}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantVocDTO> getPlantsByName(@PathVariable("name") String name){
+        return service.getPlantsByName(name);
+    }
+
+
+    // TODO: family
+    // TODO: genus
+    // TODO: rank
+    // TODO: leafHabitus
 
 
     /**
@@ -111,8 +124,8 @@ public class PlantsVocController {
     }
 
     /*
-    * POSTs
-    * */
+     * Endpoints POST
+     */
 
     @PostMapping(
             value = "/plants",
@@ -124,9 +137,6 @@ public class PlantsVocController {
             @Valid
             RequestPlantVocDTO plantDTO
     ){
-        System.out.println("ciao");
-        String name = plantDTO.getName();
-
         ResponsePlantVocDTO newPlant = service.createPlantVoc(plantDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
