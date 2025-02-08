@@ -1,6 +1,7 @@
 package org.cnr.plantvocdb.service;
 
 import org.apache.commons.lang3.StringUtils;
+import org.cnr.plantvocdb.dto.PlantEmitterDTO;
 import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
@@ -100,54 +101,34 @@ public class PlantsVocService {
                 .toList();
     }
 
-    public List<PlantInfoDTO> getAlwaysEmitters(){
-        List<PlantInfoDTO> PlantInfoDTOList = new ArrayList<>();
-        for (PlantVocEntity plant : getAllEntity()) {
+    public List<ResponsePlantVocDTO> getAlwaysEmitters(){
+        List<ResponsePlantVocDTO> plants = new ArrayList<>();
+        for (ResponsePlantVocDTO plant : getAllPlants()) {
             if(this.isAlwaysEmitter(plant)){
-                PlantInfoDTOList.add(PlantInfoDTO
-                        .builder()
-                        .id(plant.getId())
-                        .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
-                        .build());
+                plants.add(plant);
             };
         }
-        return PlantInfoDTOList;
-
+        return plants;
     }
 
-    public List<PlantInfoDTO> getNeverEmitters(){
-        List<PlantInfoDTO> PlantInfoDTOList = new ArrayList<>();
-        for (PlantVocEntity plant : getAllEntity()) {
+    public List<ResponsePlantVocDTO> getNeverEmitters(){
+        List<ResponsePlantVocDTO> plants = new ArrayList<>();
+        for (ResponsePlantVocDTO plant : getAllPlants()) {
             if(this.isNeverEmitter(plant)){
-                PlantInfoDTOList.add(PlantInfoDTO
-                        .builder()
-                        .id(plant.getId())
-                        .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
-                        .build());
+                plants.add(plant);
             };
         }
-        return PlantInfoDTOList;
+        return plants;
     }
 
-    public List<PlantInfoDTO> getMixedEmitters(){
-        List<PlantInfoDTO> PlantInfoDTOList = new ArrayList<>();
-        for (PlantVocEntity plant : getAllEntity()) {
+    public List<ResponsePlantVocDTO> getMixedEmitters(){
+        List<ResponsePlantVocDTO> plants = new ArrayList<>();
+        for (ResponsePlantVocDTO plant : getAllPlants()) {
             if(this.isMixedEmitter(plant)){
-                PlantInfoDTOList.add(PlantInfoDTO
-                        .builder()
-                        .id(plant.getId())
-                        .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
-                        .build());
+                plants.add(plant);
             }
         };
-        return PlantInfoDTOList;
-    }
-
-    public List<ResponsePlantVocDTO> getAll() {
-        // get all Entity stored in the DB and map DTO
-        return getAllEntity().stream()
-                .map(it -> mapper.map(it, ResponsePlantVocDTO.class))
-                .toList();
+        return plants;
     }
 
     public ResponsePlantVocDTO createPlantVoc(RequestPlantVocDTO plantDTO){
@@ -170,29 +151,29 @@ public class PlantsVocService {
         return mapper.map(savedPlantEntity, ResponsePlantVocDTO.class);
     }
 
-    private Boolean isAlwaysEmitter(PlantVocEntity plantVocEntity){
-        List<Boolean> boolList = plantVocEntity
+    private Boolean isAlwaysEmitter(ResponsePlantVocDTO plant){
+        List<Boolean> boolList = plant
                 .getEmitter()
                 .stream()
-                .map(PlantEmitterEntity::isEmits)
+                .map(PlantEmitterDTO::isEmits)
                 .toList();
         return boolList.stream().allMatch(b -> b);
     }
 
-    private Boolean isNeverEmitter(PlantVocEntity plantVocEntity){
-        List<Boolean> boolList = plantVocEntity
+    private Boolean isNeverEmitter(ResponsePlantVocDTO plant){
+        List<Boolean> boolList = plant
                 .getEmitter()
                 .stream()
-                .map(PlantEmitterEntity::isEmits)
+                .map(PlantEmitterDTO::isEmits)
                 .toList();
         return boolList.stream().noneMatch(b -> b);
     }
 
-    private Boolean isMixedEmitter(PlantVocEntity plantVocEntity){
-        List<Boolean> boolList = plantVocEntity
+    private Boolean isMixedEmitter(ResponsePlantVocDTO plant){
+        List<Boolean> boolList = plant
                 .getEmitter()
                 .stream()
-                .map(PlantEmitterEntity::isEmits)
+                .map(PlantEmitterDTO::isEmits)
                 .toList();
         boolean flag = false;
         if(boolList.size() != 1) {
@@ -201,10 +182,11 @@ public class PlantsVocService {
         return flag;
     }
 
-    private List<PlantVocEntity> getAllEntity(){
+    private List<ResponsePlantVocDTO> getAllPlants(){
         return repository
                 .findAll()
                 .stream()
+                .map(it -> mapper.map(it, ResponsePlantVocDTO.class))
                 .toList();
     }
 

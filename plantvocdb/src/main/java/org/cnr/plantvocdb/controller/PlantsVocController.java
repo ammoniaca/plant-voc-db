@@ -136,35 +136,35 @@ public class PlantsVocController {
     }
 
     /**
-     * Get List of Plants always emitters (i.e.,always true)
+     * Get List of Plants Voc always emitters (i.e.,always true)
      */
     @GetMapping(
             value = "/plants/always-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<PlantInfoDTO> getPlantsAlwaysEmitter(){
+    public List<ResponsePlantVocDTO> getPlantsAlwaysEmitter(){
         return service.getAlwaysEmitters();
     }
 
     /**
-     * Get List of Plants never emitters (i.e., always false)
+     * Get List of Plants Voc never emitters (i.e., always false)
      */
     @GetMapping(
             value = "/plants/never-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<PlantInfoDTO> getPlantsNeverEmitter(){
+    public List<ResponsePlantVocDTO> getPlantsNeverEmitter(){
         return service.getNeverEmitters();
     }
 
     /**
-     * Get List of Plants mixed emitters (i.e., sometimes true and sometimes false)
+     * Get List of Plants Voc mixed emitters (i.e., sometimes true and sometimes false)
      */
     @GetMapping(
             value = "/plants/mixed-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<PlantInfoDTO> getPlantsMixedEmitter(){
+    public List<ResponsePlantVocDTO> getPlantsMixedEmitter(){
         return service.getMixedEmitters();
     }
 
