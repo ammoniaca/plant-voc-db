@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
+import org.cnr.plantvocdb.enums.LeafHabitus;
+import org.cnr.plantvocdb.enums.PlantsRanks;
 import org.cnr.plantvocdb.service.PlantsVocService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,23 +37,26 @@ public class PlantsVocController {
      * Endpoints GET
      */
 
+    /**
+     * Get a List of Plants Voc infos
+     * */
     @GetMapping(
             value = "/plants",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<PlantInfoDTO> getPlantsVocInfo(){
-        return service.getAllPlantsInfo();
+        return service.retrieveAllPlantsInfo();
     }
 
     /**
-     * Get Plant Voc by ID
+     * Get a single Plant Voc by ID
      */
     @GetMapping(
             value = "/plants/id/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> getPlantById(@PathVariable("id") UUID id){
-        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.getPlantById(id);
+        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.retrievePlantById(id);
         return optionalResponsePlantVocDTO.map(
                 responsePlantVocDTO -> ResponseEntity
                 .status(HttpStatus.FOUND)
@@ -60,14 +65,14 @@ public class PlantsVocController {
     }
 
     /**
-     * Get Plant Voc by IPNI (International Plant Names Index) code
+     * Get a single Plant Voc by IPNI (International Plant Names Index) code
      */
     @GetMapping(
             value = "/plants/ipni/{ipni}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> getPlantByIpni(@PathVariable("ipni") String ipni){
-        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.getPlantByIpni(ipni);
+        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.retrievePlantByIpni(ipni);
         return optionalResponsePlantVocDTO.map(
                         responsePlantVocDTO -> ResponseEntity
                                 .status(HttpStatus.FOUND)
@@ -75,23 +80,63 @@ public class PlantsVocController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Get a List of Plants Voc by name attribute
+     */
     @GetMapping(
-            value = "/plants/name/{name}",
+            value = "/plants/names/{name}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByName(@PathVariable("name") String name){
-        return service.getPlantsByName(name);
+        return service.retrievePlantsByName(name);
     }
 
-
-    // TODO: family
-    // TODO: genus
-    // TODO: rank
-    // TODO: leafHabitus
-
+    /**
+     * Get a List of Plants Voc by family attribute
+     */
+    @GetMapping(
+            value = "/plants/families/{family}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantVocDTO> getPlantsByFamily(@PathVariable("family") String family){
+        return service.retrievePlantsByFamily(family);
+    }
 
     /**
-     * Get List of Plant always emitters (i.e.,always true)
+     * Get a List of Plants Voc by genus attribute
+     */
+    @GetMapping(
+            value = "/plants/genera/{genus}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantVocDTO> getPlantsByGenus(@PathVariable("genus") String genus){
+        return service.retrievePlantsByGenus(genus);
+    }
+
+    /**
+     * Get a List of Plants Voc by rank attribute
+     */
+    @GetMapping(
+            value = "/plants/ranks/{rank}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantVocDTO> getPlantsByRank(@PathVariable("rank") PlantsRanks rank){
+        return service.retrieveByRank(rank);
+    }
+
+    /**
+     * Get a List of Plants Voc by habitus attribute
+     */
+    @GetMapping(
+            value = "/plants/leaf-habitus/{leaf-habitus}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantVocDTO> getPlantsByHabitus(@PathVariable("leaf-habitus") LeafHabitus leafHabitus){
+        return service.retrievePlantsByLeafHabitus(leafHabitus);
+    }
+
+    /**
+     * Get List of Plants always emitters (i.e.,always true)
      */
     @GetMapping(
             value = "/plants/always-emitters",
@@ -102,7 +147,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get List of Plant never emitters (i.e., always false)
+     * Get List of Plants never emitters (i.e., always false)
      */
     @GetMapping(
             value = "/plants/never-emitters",
@@ -113,7 +158,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get List of Plant mixed emitters (i.e., sometimes true and sometimes false)
+     * Get List of Plants mixed emitters (i.e., sometimes true and sometimes false)
      */
     @GetMapping(
             value = "/plants/mixed-emitters",
