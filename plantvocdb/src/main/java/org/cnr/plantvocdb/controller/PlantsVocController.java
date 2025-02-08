@@ -34,12 +34,14 @@ public class PlantsVocController {
 
 
     /*
+     *
      * Endpoints GET
-     */
+     *
+     * */
 
     /**
-     * Get a List of Plants Voc infos
-     * */
+     * Get a list of all plants VOC as infos
+     */
     @GetMapping(
             value = "/plants",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -49,7 +51,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a single Plant Voc by ID
+     * Get a single plant VOC by ID
      */
     @GetMapping(
             value = "/plants/id/{id}",
@@ -65,7 +67,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a single Plant Voc by IPNI (International Plant Names Index) code
+     * Get a single plant VOC by IPNI (International Plant Names Index) code
      */
     @GetMapping(
             value = "/plants/ipni/{ipni}",
@@ -81,7 +83,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a List of Plants Voc by name attribute
+     * Get a list of plants VOC by name attribute
      */
     @GetMapping(
             value = "/plants/names/{name}",
@@ -92,7 +94,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a List of Plants Voc by family attribute
+     * Get a list of plants VOC by family attribute
      */
     @GetMapping(
             value = "/plants/families/{family}",
@@ -103,7 +105,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a List of Plants Voc by genus attribute
+     * Get a list of plants VOC by genus attribute
      */
     @GetMapping(
             value = "/plants/genera/{genus}",
@@ -114,7 +116,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a List of Plants Voc by rank attribute
+     * Get a list of plants VOC by rank attribute
      */
     @GetMapping(
             value = "/plants/ranks/{rank}",
@@ -125,7 +127,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a List of Plants Voc by habitus attribute
+     * Get a List of plants VOC by habitus attribute
      */
     @GetMapping(
             value = "/plants/leaf-habitus/{leaf-habitus}",
@@ -136,7 +138,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get List of Plants Voc always emitters (i.e.,always true)
+     * Get list of plants VOC always emitters (i.e.,always true)
      */
     @GetMapping(
             value = "/plants/always-emitters",
@@ -147,7 +149,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get List of Plants Voc never emitters (i.e., always false)
+     * Get list of plants VOC never emitters (i.e., always false)
      */
     @GetMapping(
             value = "/plants/never-emitters",
@@ -158,7 +160,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get List of Plants Voc mixed emitters (i.e., sometimes true and sometimes false)
+     * Get list of plants VOC mixed emitters (i.e., sometimes true and sometimes false)
      */
     @GetMapping(
             value = "/plants/mixed-emitters",
@@ -169,9 +171,14 @@ public class PlantsVocController {
     }
 
     /*
-     * Endpoints POST
-     */
+    *
+    * Endpoints POST
+    *
+    * */
 
+    /**
+     * Post a single new plants VOC
+     */
     @PostMapping(
             value = "/plants",
             consumes = MediaType.APPLICATION_JSON_VALUE,
