@@ -133,7 +133,7 @@ public class PlantsVocController {
             value = "/plants/leaf-habitus/{leaf-habitus}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<ResponsePlantVocDTO> getPlantsByHabitus(@PathVariable("leaf-habitus") LeafHabitus leafHabitus){
+    public List<ResponsePlantVocDTO> getPlantsByLeafHabitus(@PathVariable("leaf-habitus") LeafHabitus leafHabitus){
         return service.retrievePlantsByLeafHabitus(leafHabitus);
     }
 
