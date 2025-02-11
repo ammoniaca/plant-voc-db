@@ -14,14 +14,19 @@ public class PlantEmitterEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="emits")
+    @Column(name="emits", length = 50)
     private boolean emits;
 
     @Column(name="doi")
     private String doi;
 
     @ManyToOne
-    @JoinColumn(name = "fk_plant_id", nullable = false, updatable = true, insertable = true)
+    @JoinColumn(
+            name = "fk_emitters_plant_id",
+            nullable = false,
+            updatable = true,
+            insertable = true,
+            foreignKey = @ForeignKey(name = "FK_emitters_plant"))
     private PlantVocEntity plant;
 
 }

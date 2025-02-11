@@ -36,7 +36,7 @@ public class PlantVocEntity {
     private String fullNameNoAuthorsPlain;
 
     @Setter(AccessLevel.NONE)
-    @Column(name="name", length = 30, nullable = false)
+    @Column(name="plant_name", length = 30, nullable = false)
     private String name;
 
     @Setter(AccessLevel.NONE)
@@ -44,21 +44,21 @@ public class PlantVocEntity {
     private String family;
 
     @Setter(AccessLevel.NONE)
-    @Column(name="genus", length = 20, nullable = false)
+    @Column(name="genus", length = 30, nullable = false)
     private String genus;
 
     @Setter(AccessLevel.NONE)
-    @Column(name="species", length = 20)
+    @Column(name="species", length = 30, nullable = false)
     private String species;
 
     @Column(name="valid_nomenclature")
     private boolean validNomenclature;
 
-    @Column(name="rank")
+    @Column(name="rank", length = 20)
     @Enumerated(EnumType.STRING)
     private PlantsRanks rank;
 
-    @Column(name="leaf_habitus")
+    @Column(name="leaf_habitus", length = 20)
     @Enumerated(EnumType.STRING)
     private LeafHabitus leafHabitus;
 
@@ -70,6 +70,11 @@ public class PlantVocEntity {
     private Set<PlantEmitterEntity> emitter;
 
     @ElementCollection
+    @CollectionTable(
+            name = "synonyms", // Nome della tabella intermedia
+            joinColumns = @JoinColumn(name = "fk_synonyms_plant_id"),
+            foreignKey = @ForeignKey(name = "FK_synonyms_plant")
+    )
     @Column(name="synonyms")
     private Set<String> synonyms;
 

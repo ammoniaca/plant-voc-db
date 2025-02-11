@@ -169,6 +169,7 @@ public class PlantsVocService {
         return boolList.stream().noneMatch(b -> b);
     }
 
+    // TODO: not works bug!!!!!
     private Boolean isMixedEmitter(ResponsePlantVocDTO plant){
         List<Boolean> boolList = plant
                 .getEmitter()
