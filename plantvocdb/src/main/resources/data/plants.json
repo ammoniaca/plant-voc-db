@@ -1,0 +1,117 @@
+{
+  "plants": [
+    {
+      "ipni": "urn:lsid:ipni.org:names:294902-1",
+      "fullNameWithAuthors": "Alnus cordata (Loisel.) Duby",
+      "fullNameNoAuthors": "Alnus cordata",
+      "name": "cordata",
+      "family": "Betulaceae",
+      "genus": "Alnus",
+      "species": "cordata",
+      "validNomenclature": true,
+      "rank": "SPECIES",
+      "leafHabitus": "DECIDUOUS",
+      "synonyms": [
+        "Alnus cordata var. rotundifolia Dippel",
+        "Alnus cordifolia var. rotundifolia Regel",
+        "Alnus rotundifolia Bertol.",
+        "Betula cordata Loisel."
+      ],
+      "emitter": [{
+        "emits": true,
+        "doi": "https://doi.org/10.1111/nph.13242"
+      }]
+    },
+    {
+      "ipni": "urn:lsid:ipni.org:names:57443-2",
+      "fullNameWithAuthors": "Chromolaena odorata (L.) R.M.King & H.Rob.",
+      "fullNameNoAuthors": "Chromolaena odorata",
+      "name": "odorata",
+      "family": "Asteraceae",
+      "genus": "Chromolaena",
+      "species": "odorata",
+      "validNomenclature": true,
+      "rank": "SPECIES",
+      "leafHabitus": "EVERGREEN",
+      "emitter": [
+        {
+          "emits": true,
+          "doi": "https://doi.org/10.1111/nph.15304"
+        },
+        {
+          "emits": true,
+          "doi": "https://doi.org/10.1111/nph.13242"
+        }
+      ]
+    },
+    {
+      "ipni": "urn:lsid:ipni.org:names:1084057-2",
+      "fullNameWithAuthors": "Abies balsamea (L.) Mill.",
+      "fullNameNoAuthors": "Abies balsamea",
+      "name": "balsamea",
+      "family": "Pinaceae",
+      "genus": "Abies",
+      "species": "balsamea",
+      "validNomenclature": true,
+      "rank": "SPECIES",
+      "leafHabitus": "EVERGREEN",
+      "synonyms": [
+        "Peuce balsamea (L.) Rich.",
+        "Picea balsamea (L.) Loudon",
+        "Pinus balsamea L.",
+        "Pinus taxifolia Salisb."
+      ],
+      "emitter": [
+        {
+          "emits": false,
+          "doi": "https://doi.org/10.1111/nph.13242"
+        }
+      ]
+    },
+    {
+      "ipni": "urn:lsid:ipni.org:names:1146685-2",
+      "fullNameWithAuthors": "Abies bracteata (D.Don) Poit.",
+      "fullNameNoAuthors": "Abies bracteata",
+      "name": "bracteata",
+      "family": "Pinaceae",
+      "genus": "Abies",
+      "species": "bracteata",
+      "validNomenclature":true,
+      "rank": "SPECIES",
+      "leafHabitus": "EVERGREEN",
+      "synonyms":  [
+        "Picea bracteata (D.Don) Loudon",
+        "Pinus bracteata D.Don"
+      ],
+      "emitter": [
+        {
+          "emits": false,
+          "doi": "https://doi.org/10.1111/nph.13242"}
+      ]
+    },
+    {
+      "ipni": "urn:lsid:ipni.org:names:261486-1",
+      "fullNameWithAuthors": "Abies cephalonica Loudon",
+      "fullNameNoAuthors": "Abies cephalonica",
+      "name": "cephalonica",
+      "family": "Pinaceae",
+      "genus": "Abies",
+      "species": "cephalonica",
+      "validNomenclature": true,
+      "rank": "SPECIES",
+      "leafHabitus": "EVERGREEN",
+      "synonyms": [
+        "Abies alba subsp. cephalonica (Loudon) K.Richt.",
+        "Picea cephalonica (Loudon) Loudon",
+        "Pinus abies var. cephalonica (Loudon) Christ",
+        "Pinus cephalonica (Loudon) Endl."
+      ],
+      "emitter": [
+        {
+          "emits": false,
+          "doi": "https://doi.org/10.1111/nph.13242"
+        }
+      ]
+    }
+  ]
+}

@@ -5,7 +5,6 @@ import org.cnr.plantvocdb.dto.PlantEmitterDTO;
 import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
-import org.cnr.plantvocdb.entity.PlantEmitterEntity;
 import org.cnr.plantvocdb.entity.PlantVocEntity;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsRanks;
@@ -29,7 +28,8 @@ public class PlantsVocService {
 
 
     @Autowired
-    public PlantsVocService(PlantsVocRepository repository, ModelMapper mapper) {
+    public PlantsVocService(PlantsVocRepository repository,
+                            ModelMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
 
@@ -131,10 +131,10 @@ public class PlantsVocService {
         return plants;
     }
 
-    public ResponsePlantVocDTO createPlantVoc(RequestPlantVocDTO plantDTO){
+    public ResponsePlantVocDTO createPlantVoc(RequestPlantVocDTO plant){
 
         // map DTO to Entity
-        PlantVocEntity plantEntity = mapper.map(plantDTO, PlantVocEntity.class);
+        PlantVocEntity plantEntity = mapper.map(plant, PlantVocEntity.class);
 
         // set datetime in UTC
         OffsetDateTime odt = OffsetDateTime.now(ZoneOffset.UTC);
