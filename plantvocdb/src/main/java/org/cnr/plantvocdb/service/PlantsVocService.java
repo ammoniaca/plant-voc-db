@@ -7,6 +7,7 @@ import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
 import org.cnr.plantvocdb.entity.PlantVocEntity;
 import org.cnr.plantvocdb.enums.LeafHabitus;
+import org.cnr.plantvocdb.enums.PlantsEmitterType;
 import org.cnr.plantvocdb.enums.PlantsRanks;
 import org.cnr.plantvocdb.repository.PlantsVocRepository;
 import org.modelmapper.ModelMapper;
@@ -36,11 +37,30 @@ public class PlantsVocService {
     }
 
     public List<PlantInfoDTO> retrieveAllPlantsInfo() {
-        return repository
-                .findAll()
-                .stream()
-                .map(it -> mapper.map(it, PlantInfoDTO.class))
-                .toList();
+        List<ResponsePlantVocDTO> listPlantsDTO = getAllPlants();
+        List<PlantInfoDTO> listPlantsInfo = new ArrayList<>();
+        for (ResponsePlantVocDTO plant : listPlantsDTO) {
+            OffsetDateTime createdAt = plant.getCreatedDatetimeUTC();
+            OffsetDateTime updatedAt = plant.getUpdatedDatetimeUTC();
+            boolean dateFlag = createdAt.isEqual(updatedAt);
+            PlantsEmitterType emitterType = this.getEmitterType(plant);
+            PlantInfoDTO plantInfo = PlantInfoDTO
+                    .builder()
+                    .id(plant.getId())
+                    .fullNameNoAuthors(plant.getFullNameNoAuthorsPlain())
+                    .updated(!dateFlag)
+                    .emitterType(emitterType)
+                    .build();
+            listPlantsInfo.add(plantInfo);
+        }
+        return listPlantsInfo;
+//
+//        return repository
+//                .findAll()
+//                .stream()
+//                .map(it -> mapper.map(it, PlantInfoDTO.class))
+//                .toList();
+
     }
 
     public Optional<ResponsePlantVocDTO> retrievePlantById(UUID id) {
@@ -169,7 +189,6 @@ public class PlantsVocService {
         return boolList.stream().noneMatch(b -> b);
     }
 
-    // TODO: not works bug!!!!!
     private Boolean isMixedEmitter(ResponsePlantVocDTO plant){
         List<Boolean> boolList = plant
                 .getEmitter()
@@ -181,6 +200,18 @@ public class PlantsVocService {
             flag = boolList.stream().distinct().count() == 1;
         }
         return flag;
+    }
+
+    private PlantsEmitterType getEmitterType(ResponsePlantVocDTO plant){
+        PlantsEmitterType result;
+        if (this.isAlwaysEmitter(plant)){
+            result = PlantsEmitterType.ALWAYS;
+        } else if (this.isNeverEmitter(plant)){
+            result = PlantsEmitterType.NEVER;
+        } else {
+            result = PlantsEmitterType.MIXED;
+        }
+        return result;
     }
 
     private List<ResponsePlantVocDTO> getAllPlants(){
