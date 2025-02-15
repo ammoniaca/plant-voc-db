@@ -6,6 +6,7 @@ import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsRanks;
+import org.cnr.plantvocdb.exceptions.PlantNotFoundException;
 import org.cnr.plantvocdb.service.PlantsVocService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/voc")
 public class PlantsVocController {
-
 
     private final PlantsVocService service;
 
@@ -54,16 +54,16 @@ public class PlantsVocController {
      * Get a single plant VOC by ID
      */
     @GetMapping(
-            value = "/plants/id/{id}",
+            value = "/plants/id/{plantId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getPlantById(@PathVariable("id") UUID id){
-        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.retrievePlantById(id);
+    public ResponseEntity<?> getPlantById(@PathVariable("plantId") UUID plantId){
+        Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.retrievePlantById(plantId);
         return optionalResponsePlantVocDTO.map(
                 responsePlantVocDTO -> ResponseEntity
                 .status(HttpStatus.FOUND)
                 .body(responsePlantVocDTO))
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new PlantNotFoundException("Plant not found with id: " + plantId.toString()));
     }
 
     /**
@@ -89,8 +89,15 @@ public class PlantsVocController {
             value = "/plants/names/{name}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<ResponsePlantVocDTO> getPlantsByName(@PathVariable("name") String name){
-        return service.retrievePlantsByName(name);
+    public List<ResponsePlantVocDTO> getPlantsByName(
+            @PathVariable("name") String name
+    ){
+        List<ResponsePlantVocDTO> plants = service.retrievePlantsByName(name);
+        if(plants.isEmpty()){
+
+        }
+        return plants;
+
     }
 
     /**
@@ -101,7 +108,9 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByFamily(@PathVariable("family") String family){
+
         return service.retrievePlantsByFamily(family);
+
     }
 
     /**
@@ -112,7 +121,9 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByGenus(@PathVariable("genus") String genus){
+
         return service.retrievePlantsByGenus(genus);
+
     }
 
     /**
@@ -123,7 +134,9 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByRank(@PathVariable("rank") PlantsRanks rank){
+
         return service.retrieveByRank(rank);
+
     }
 
     /**
@@ -134,6 +147,7 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByLeafHabitus(@PathVariable("leaf-habitus") LeafHabitus leafHabitus){
+
         return service.retrievePlantsByLeafHabitus(leafHabitus);
     }
 
@@ -145,6 +159,7 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsAlwaysEmitter(){
+
         return service.getAlwaysEmitters();
     }
 
@@ -156,6 +171,7 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsNeverEmitter(){
+
         return service.getNeverEmitters();
     }
 
@@ -167,6 +183,7 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsMixedEmitter(){
+
         return service.getMixedEmitters();
     }
 
