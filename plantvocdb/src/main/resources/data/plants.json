@@ -9,8 +9,8 @@
       "genus": "Alnus",
       "species": "cordata",
       "validNomenclature": true,
-      "rank": "SPECIES",
-      "leafHabitus": "DECIDUOUS",
+      "rank": "species",
+      "leafHabitus": "deciduous",
       "synonyms": [
         "Alnus cordata var. rotundifolia Dippel",
         "Alnus cordifolia var. rotundifolia Regel",
@@ -31,8 +31,8 @@
       "genus": "Chromolaena",
       "species": "odorata",
       "validNomenclature": true,
-      "rank": "SPECIES",
-      "leafHabitus": "EVERGREEN",
+      "rank": "species",
+      "leafHabitus": "evergreen",
       "emitter": [
         {
           "emits": true,
@@ -53,8 +53,8 @@
       "genus": "Abies",
       "species": "balsamea",
       "validNomenclature": true,
-      "rank": "SPECIES",
-      "leafHabitus": "EVERGREEN",
+      "rank": "species",
+      "leafHabitus": "evergreen",
       "synonyms": [
         "Peuce balsamea (L.) Rich.",
         "Picea balsamea (L.) Loudon",
@@ -77,8 +77,8 @@
       "genus": "Abies",
       "species": "bracteata",
       "validNomenclature":true,
-      "rank": "SPECIES",
-      "leafHabitus": "EVERGREEN",
+      "rank": "species",
+      "leafHabitus": "evergreen",
       "synonyms":  [
         "Picea bracteata (D.Don) Loudon",
         "Pinus bracteata D.Don"
@@ -98,8 +98,8 @@
       "genus": "Abies",
       "species": "cephalonica",
       "validNomenclature": true,
-      "rank": "SPECIES",
-      "leafHabitus": "EVERGREEN",
+      "rank": "species",
+      "leafHabitus": "evergreen",
       "synonyms": [
         "Abies alba subsp. cephalonica (Loudon) K.Richt.",
         "Picea cephalonica (Loudon) Loudon",
