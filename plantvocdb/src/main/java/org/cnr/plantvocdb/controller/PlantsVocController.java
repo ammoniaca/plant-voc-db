@@ -63,7 +63,7 @@ public class PlantsVocController {
             value = "/plants/id/{plantId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getPlantById(@PathVariable("plantId") UUID plantId){
+    public ResponseEntity<ResponsePlantVocDTO> getPlantById(@PathVariable("plantId") UUID plantId){
         Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.retrievePlantById(plantId);
         return optionalResponsePlantVocDTO.map(
                 responsePlantVocDTO -> ResponseEntity
@@ -79,7 +79,7 @@ public class PlantsVocController {
             value = "/plants/ipni/{ipni}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getPlantByIpni(@PathVariable("ipni") String ipni){
+    public ResponseEntity<ResponsePlantVocDTO> getPlantByIpni(@PathVariable("ipni") String ipni){
         Optional<ResponsePlantVocDTO> optionalResponsePlantVocDTO = service.retrievePlantByIpni(ipni);
         return optionalResponsePlantVocDTO.map(
                         responsePlantVocDTO -> ResponseEntity
@@ -135,11 +135,13 @@ public class PlantsVocController {
             value = "/plants/genera/{genus}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<ResponsePlantVocDTO> getPlantsByGenus(@PathVariable("genus") String genus){
+    public List<ResponsePlantVocDTO> getPlantsByGenus(
+            @PathVariable("genus") String genus
+    ){
         List<ResponsePlantVocDTO> plants = service.retrievePlantsByGenus(genus);
         if(plants.isEmpty()){
             String errorMessage = MessageFormat.format(
-                    "Plants not found with family: {0}.",
+                    "Plants not found with genus: {0}.",
                     StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase())));
             throw new PlantNotFoundException(errorMessage);
         }
@@ -153,7 +155,10 @@ public class PlantsVocController {
             value = "/plants/ranks/{rank}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<ResponsePlantVocDTO> getPlantsByRank(@PathVariable("rank") PlantsRanks rank){
+    public List<ResponsePlantVocDTO> getPlantsByRank(
+            @Valid
+            @PathVariable("rank") PlantsRanks rank
+    ){
         List<ResponsePlantVocDTO> plants = service.retrievePlantsByRank(rank);
         if (plants.isEmpty()){
             String errorMessage = MessageFormat.format(
@@ -171,7 +176,9 @@ public class PlantsVocController {
             value = "/plants/leaf-habitus/{leaf-habitus}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<ResponsePlantVocDTO> getPlantsByLeafHabitus(@PathVariable("leaf-habitus") LeafHabitus leafHabitus){
+    public List<ResponsePlantVocDTO> getPlantsByLeafHabitus(
+            @PathVariable("leaf-habitus") LeafHabitus leafHabitus
+    ){
         List<ResponsePlantVocDTO> plants = service.retrievePlantsByLeafHabitus(leafHabitus);
         if(plants.isEmpty()){
             String errorMessage = MessageFormat.format(
