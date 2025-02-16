@@ -15,8 +15,8 @@ public class GlobalExceptionHandler {
       ErrorResponseDTO plantNotFound = ErrorResponseDTO
               .builder().timestamp(LocalDateTime.now())
               .status(HttpStatus.NOT_FOUND.value())
-              .message(ex.getMessage())
-              .details("Plant not found")
+              .details(ex.getMessage())
+              .message(HttpStatus.NOT_FOUND.name())
               .build();
 
       return ResponseEntity

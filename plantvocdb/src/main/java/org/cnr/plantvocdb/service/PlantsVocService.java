@@ -106,7 +106,7 @@ public class PlantsVocService {
                 .toList();
     }
 
-    public List<ResponsePlantVocDTO> retrieveByRank(PlantsRanks rank){
+    public List<ResponsePlantVocDTO> retrievePlantsByRank(PlantsRanks rank){
         return repository.findByRank(rank)
                 .stream()
                 .map(it -> mapper.map(it, ResponsePlantVocDTO.class))

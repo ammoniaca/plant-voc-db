@@ -1,6 +1,7 @@
 package org.cnr.plantvocdb.controller;
 
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantVocDTO;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,7 +49,11 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<PlantInfoDTO> getPlantsVocInfo(){
-        return service.retrieveAllPlantsInfo();
+        List<PlantInfoDTO> plantInfos = service.retrieveAllPlantsInfo();
+        if(plantInfos.isEmpty()){
+            throw new PlantNotFoundException("Plants not found.");
+        }
+        return plantInfos;
     }
 
     /**
@@ -79,7 +85,9 @@ public class PlantsVocController {
                         responsePlantVocDTO -> ResponseEntity
                                 .status(HttpStatus.FOUND)
                                 .body(responsePlantVocDTO))
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new PlantNotFoundException(
+                        MessageFormat.format("Plant not found with ipni code: {0}.", ipni))
+                );
     }
 
     /**
@@ -94,10 +102,11 @@ public class PlantsVocController {
     ){
         List<ResponsePlantVocDTO> plants = service.retrievePlantsByName(name);
         if(plants.isEmpty()){
-
+            String errorMessage = MessageFormat.format("Plants not found with name: {0}.",
+                    StringUtils.normalizeSpace(name.toLowerCase()));
+            throw new PlantNotFoundException(errorMessage);
         }
         return plants;
-
     }
 
     /**
@@ -108,8 +117,14 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByFamily(@PathVariable("family") String family){
-
-        return service.retrievePlantsByFamily(family);
+        List<ResponsePlantVocDTO> plants = service.retrievePlantsByFamily(family);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with family: {0}.",
+                    StringUtils.normalizeSpace(StringUtils.capitalize(family.toLowerCase())));
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
 
     }
 
@@ -121,9 +136,14 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByGenus(@PathVariable("genus") String genus){
-
-        return service.retrievePlantsByGenus(genus);
-
+        List<ResponsePlantVocDTO> plants = service.retrievePlantsByGenus(genus);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with family: {0}.",
+                    StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase())));
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
     }
 
     /**
@@ -134,9 +154,14 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByRank(@PathVariable("rank") PlantsRanks rank){
-
-        return service.retrieveByRank(rank);
-
+        List<ResponsePlantVocDTO> plants = service.retrievePlantsByRank(rank);
+        if (plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with rank: {0}.",
+                    rank.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
     }
 
     /**
@@ -147,8 +172,14 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsByLeafHabitus(@PathVariable("leaf-habitus") LeafHabitus leafHabitus){
-
-        return service.retrievePlantsByLeafHabitus(leafHabitus);
+        List<ResponsePlantVocDTO> plants = service.retrievePlantsByLeafHabitus(leafHabitus);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with leaf habitus: {0}.",
+                    leafHabitus.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
     }
 
     /**
@@ -159,8 +190,11 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsAlwaysEmitter(){
-
-        return service.getAlwaysEmitters();
+        List<ResponsePlantVocDTO> plants = service.getAlwaysEmitters();
+        if(plants.isEmpty()){
+            throw new PlantNotFoundException("Plants always emitter not found.");
+        }
+        return plants;
     }
 
     /**
@@ -171,8 +205,11 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsNeverEmitter(){
-
-        return service.getNeverEmitters();
+        List<ResponsePlantVocDTO> plants = service.getNeverEmitters();
+        if(plants.isEmpty()){
+            throw new PlantNotFoundException("Plants never emitter not found.");
+        }
+        return plants;
     }
 
     /**
@@ -183,8 +220,11 @@ public class PlantsVocController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantVocDTO> getPlantsMixedEmitter(){
-
-        return service.getMixedEmitters();
+        List<ResponsePlantVocDTO> plants = service.getMixedEmitters();
+        if(plants.isEmpty()){
+            throw new PlantNotFoundException("Plants mixed emitter not found.");
+        }
+        return plants;
     }
 
     /*
