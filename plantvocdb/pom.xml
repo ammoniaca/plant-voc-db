@@ -8,6 +8,7 @@
 		<version>3.4.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>org.cnr</groupId>
 	<artifactId>plantvocdb</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -54,6 +55,16 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
+		<!-- Swagger 3 for Spring Boot 3.x -->
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.7.0</version>
+		</dependency>
+
 
 		<!-- to fix getter and setter lombok problem -->
 

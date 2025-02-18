@@ -44,6 +44,7 @@ public class PlantsVocController {
     /**
      * Get a list of all plants VOC as infos
      */
+
     @GetMapping(
             value = "/plants",
             produces = MediaType.APPLICATION_JSON_VALUE
