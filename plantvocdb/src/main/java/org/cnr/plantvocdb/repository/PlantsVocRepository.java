@@ -1,6 +1,6 @@
 package org.cnr.plantvocdb.repository;
 
-import org.cnr.plantvocdb.entity.PlantVocEntity;
+import org.cnr.plantvocdb.entity.PlantEntity;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsRanks;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,18 +12,18 @@ import java.util.UUID;
 
 @Repository
 public interface PlantsVocRepository
-        extends JpaRepository<PlantVocEntity, UUID> {
+        extends JpaRepository<PlantEntity, UUID> {
 
-    Optional<PlantVocEntity> findByIpni(String ipni);
+    Optional<PlantEntity> findByIpni(String ipni);
 
-    List<PlantVocEntity> findByName(String name);
+    List<PlantEntity> findByName(String name);
 
-    List<PlantVocEntity> findByFamily(String family);
+    List<PlantEntity> findByFamily(String family);
 
-    List<PlantVocEntity> findByGenus(String genus);
+    List<PlantEntity> findByGenus(String genus);
 
-    List<PlantVocEntity> findByRank(PlantsRanks rank);
+    List<PlantEntity> findByRank(PlantsRanks rank);
 
-    List<PlantVocEntity> findByLeafHabitus(LeafHabitus leafHabitus);
+    List<PlantEntity> findByLeafHabitus(LeafHabitus leafHabitus);
 
 }

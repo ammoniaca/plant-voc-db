@@ -20,13 +20,16 @@ public class PlantEmitterEntity {
     @Column(name="doi")
     private String doi;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(
             name = "fk_emitters_plant_id",
             nullable = false,
             updatable = true,
             insertable = true,
             foreignKey = @ForeignKey(name = "FK_emitters_plant"))
-    private PlantVocEntity plant;
+    private PlantEntity plant;
 
 }

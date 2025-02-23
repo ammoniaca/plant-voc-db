@@ -17,7 +17,7 @@ import org.cnr.plantvocdb.enums.PlantsRanks;
 @Getter
 @Setter
 @Table(name = "plants_voc")
-public class PlantVocEntity {
+public class PlantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -65,6 +65,7 @@ public class PlantVocEntity {
     @OneToMany(
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
+            orphanRemoval = true,  // Ensures childs are deleted when plant is deleted
             mappedBy = "plant"
     )
     private Set<PlantEmitterEntity> emitter;

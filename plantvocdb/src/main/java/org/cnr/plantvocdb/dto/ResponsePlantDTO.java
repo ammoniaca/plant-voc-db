@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class ResponsePlantVocDTO {
+public class ResponsePlantDTO {
 
     @JsonProperty("id")
     private UUID id;

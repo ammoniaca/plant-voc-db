@@ -1,8 +1,8 @@
 package org.cnr.plantvocdb.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cnr.plantvocdb.dto.RequestPlantVocDTO;
-import org.cnr.plantvocdb.entity.PlantVocEntity;
+import org.cnr.plantvocdb.dto.RequestPlantDTO;
+import org.cnr.plantvocdb.entity.PlantEntity;
 import org.cnr.plantvocdb.repository.PlantsVocRepository;
 import org.springframework.boot.CommandLineRunner;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,9 +41,9 @@ public class RunJsonDataLoader implements CommandLineRunner {
                 PlantsDTO allPlants = objectMapper.readValue(inputStream, PlantsDTO.class);
                 log.info("Reading {} runs from JSON data and saving to in-memory collection.", allPlants.plants().size());
                 OffsetDateTime odt = OffsetDateTime.now(ZoneOffset.UTC);
-                List<PlantVocEntity> plantList = new ArrayList<>();
-                for (RequestPlantVocDTO plant : allPlants.plants()) {
-                    PlantVocEntity plantEntity = modelMapper.map(plant, PlantVocEntity.class);
+                List<PlantEntity> plantList = new ArrayList<>();
+                for (RequestPlantDTO plant : allPlants.plants()) {
+                    PlantEntity plantEntity = modelMapper.map(plant, PlantEntity.class);
                     plantEntity.setCreatedDatetimeUTC(odt);
                     plantEntity.setUpdatedDatetimeUTC(odt);
                     plantEntity.getEmitter().forEach(it -> it.setPlant(plantEntity));

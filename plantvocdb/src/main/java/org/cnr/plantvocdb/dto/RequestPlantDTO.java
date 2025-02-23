@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class RequestPlantVocDTO {
+public class RequestPlantDTO {
 
     @JsonProperty("ipni")
     private String ipni;
