@@ -161,6 +161,12 @@ public class PlantsService {
     }
 
     // GET
+    public List<ResponsePlantDTO> findAllPlantsEmitters(PlantsEmitterType emitterFlag){
+        List<PlantEntity> listPlantsEntity = repository.findAll();
+        return getPlantsByEmitterTyper(emitterFlag, listPlantsEntity);
+    }
+
+    // GET
     public List<ResponsePlantDTO> findAllPlantsEmitterTypeByFamilyAndLeafHabitus(
             String family,
             LeafHabitus leafHabitus,

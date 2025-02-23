@@ -527,7 +527,46 @@ public class PlantsVocController {
         return plants;
     }
 
-
+    /**
+     * Get list of plants isoprene emitters (always, never, mixed)
+     */
+    @Operation(
+            summary = "Search plants always, never, or mixed isoprene emitter.",
+            description = "This endpoint allows users to search for plants always emitter (plants that have " +
+                    "consistently reported emitting isoprene in experiments), never emitter " +
+                    "(plants that have never reported emitting isoprene in experiments), or " +
+                    "mixed emitter (i.e., plants that have been shown to emit isoprene in some experiments " +
+                    "and not in others)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @GetMapping(
+            value = "/plants/emitters",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantDTO> getEmitters(
+            @RequestParam(value="emitter") PlantsEmitterType emitter
+    ){
+        List<ResponsePlantDTO> plants = service.findAllPlantsEmitters(emitter);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat
+                    .format("Plants {0} emitter not found.", emitter.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
+    }
 
     /**
      * Get list of plants isoprene emitters (always, never, mixed) by leaf-habitus and family
