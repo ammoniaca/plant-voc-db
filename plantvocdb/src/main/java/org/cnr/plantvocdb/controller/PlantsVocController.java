@@ -12,10 +12,11 @@ import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantDTO;
 import org.cnr.plantvocdb.enums.LeafHabitus;
+import org.cnr.plantvocdb.enums.PlantsEmitterType;
 import org.cnr.plantvocdb.enums.PlantsRanks;
 import org.cnr.plantvocdb.exceptions.ErrorResponseDTO;
 import org.cnr.plantvocdb.exceptions.PlantNotFoundException;
-import org.cnr.plantvocdb.service.PlantsVocService;
+import org.cnr.plantvocdb.service.PlantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,10 +36,10 @@ import java.util.UUID;
 @Tag(name = "Plant isoprene APIs")
 public class PlantsVocController {
 
-    private final PlantsVocService service;
+    private final PlantsService service;
 
     @Autowired
-    public PlantsVocController(PlantsVocService service) {
+    public PlantsVocController(PlantsService service) {
 
         this.service = service;
     }
@@ -122,7 +123,7 @@ public class PlantsVocController {
     }
 
     /**
-     * Get a single plant isoprene by IPNI (International Plant Names Index) code
+     * Get a single plant isoprene by IPNI (International Plant Names Index) code.
      */
     @Operation(
             summary = "Search plant by IPNI (International Plant Names Index) code.",
@@ -150,13 +151,62 @@ public class PlantsVocController {
     public ResponseEntity<ResponsePlantDTO> getPlantByIpni(
             @PathVariable("ipni") String ipni
     ){
-        Optional<ResponsePlantDTO> optionalResponsePlantVocDTO = service.findPlantByIpni(ipni);
-        return optionalResponsePlantVocDTO.map(
+        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service.findPlantByIpni(ipni);
+        return optionalResponsePlantDTO.map(
                         responsePlantVocDTO -> ResponseEntity
                                 .status(HttpStatus.OK)
                                 .body(responsePlantVocDTO))
                 .orElseThrow(() -> new PlantNotFoundException(
                         MessageFormat.format("Plant not found with ipni code: {0}.", ipni))
+                );
+    }
+
+
+    /**
+     * Get a plant genus and species attributes.
+     */
+    @Operation(
+            summary = "Search plant by genus and species attributes.",
+            description = "This endpoint allows users to search for a specific plant using " +
+                    "genus and species attributes."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )
+    })
+    @GetMapping(
+            value = "/plants/species",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<ResponsePlantDTO> getPlantBySpecies(
+            @RequestParam(value = "genus") String genus,
+            @RequestParam(value = "species") String species)
+    {
+        String genusSanitized = StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
+        String speciesSanitized = StringUtils.normalizeSpace(species.toLowerCase());
+        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service
+                .findPlantBySpecies(
+                        genusSanitized,
+                        speciesSanitized
+                );
+        return optionalResponsePlantDTO.map(
+                        responsePlantVocDTO -> ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body(responsePlantVocDTO))
+                .orElseThrow(() -> new PlantNotFoundException(
+                        MessageFormat.format("Plant {0} {1} not found.",
+                                genusSanitized,
+                                speciesSanitized))
                 );
     }
 
@@ -230,11 +280,13 @@ public class PlantsVocController {
             @Valid
             @PathVariable("family") String family
     ){
-        List<ResponsePlantDTO> plants = service.findPlantsByFamily(family);
+        String familySanitized = StringUtils
+                .normalizeSpace(StringUtils
+                        .capitalize(family.toLowerCase()));
+        List<ResponsePlantDTO> plants = service.findPlantsByFamily(familySanitized);
         if(plants.isEmpty()){
-            String errorMessage = MessageFormat.format(
-                    "Plants not found with family: {0}.",
-                    StringUtils.normalizeSpace(StringUtils.capitalize(family.toLowerCase())));
+            String errorMessage = MessageFormat
+                    .format("Plants not found with family: {0}.", familySanitized);
             throw new PlantNotFoundException(errorMessage);
         }
         return plants;
@@ -273,11 +325,12 @@ public class PlantsVocController {
             @Valid
             @PathVariable("genus") String genus
     ){
-        List<ResponsePlantDTO> plants = service.findPlantsByGenus(genus);
+        String genusSanitized = StringUtils
+                .normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
+        List<ResponsePlantDTO> plants = service.findPlantsByGenus(genusSanitized);
         if(plants.isEmpty()){
-            String errorMessage = MessageFormat.format(
-                    "Plants not found with genus: {0}.",
-                    StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase())));
+            String errorMessage = MessageFormat
+                    .format("Plants not found with genus: {0}.", genusSanitized);
             throw new PlantNotFoundException(errorMessage);
         }
         return plants;
@@ -306,8 +359,8 @@ public class PlantsVocController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
     @GetMapping(
             value = "/plants/ranks/{rank}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -349,8 +402,8 @@ public class PlantsVocController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
     @GetMapping(
             value = "/plants/leaf-habitus/{leaf-habitus}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -375,7 +428,8 @@ public class PlantsVocController {
     @Operation(
             summary = "Search plants that have consistently emitted isoprene in experiments.",
             description = "This endpoint allows users to search for plants in the database that have consistently " +
-                    "reported emitting isoprene in experiments."
+                    "reported emitting isoprene in experiments.",
+            hidden = true
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -389,14 +443,14 @@ public class PlantsVocController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
     @GetMapping(
             value = "/plants/always-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantDTO> getPlantsAlwaysEmitter(){
-        List<ResponsePlantDTO> plants = service.getAlwaysEmitters();
+        List<ResponsePlantDTO> plants = service.findAllPlantsAlwaysEmitters();
         if(plants.isEmpty()){
             throw new PlantNotFoundException("Plants always emitter not found.");
         }
@@ -409,27 +463,8 @@ public class PlantsVocController {
     @Operation(
             summary = "Search plants that have never emitted isoprene in experiments.",
             description = "This endpoint allows users to search for plants that have never reported emitting " +
-                    "isoprene in experiments."
-    )
-    @GetMapping(
-            value = "/plants/never-emitters",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public List<ResponsePlantDTO> getPlantsNeverEmitter(){
-        List<ResponsePlantDTO> plants = service.getNeverEmitters();
-        if(plants.isEmpty()){
-            throw new PlantNotFoundException("Plants never emitter not found.");
-        }
-        return plants;
-    }
-
-    /**
-     * Get list of plants isoprene mixed emitters (i.e., sometimes true and sometimes false)
-     */
-    @Operation(
-            summary = "Search plants that have been shown to emmit isoprene in some experiments and not in others.",
-            description = "This endpoint allows users to search for plants that have have been shown to emmit " +
-                    "isoprene in some experiments and not in others."
+                    "isoprene in experiments.",
+            hidden = true
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -443,14 +478,49 @@ public class PlantsVocController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @GetMapping(
+            value = "/plants/never-emitters",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantDTO> getPlantsNeverEmitter(){
+        List<ResponsePlantDTO> plants = service.findAllPlantsNeverEmitters();
+        if(plants.isEmpty()){
+            throw new PlantNotFoundException("Plants never emitter not found.");
+        }
+        return plants;
+    }
+
+    /**
+     * Get list of plants isoprene mixed emitters (i.e., sometimes true and sometimes false)
+     */
+    @Operation(
+            summary = "Search plants that have been shown to emmit isoprene in some experiments and not in others.",
+            description = "This endpoint allows users to search for plants that have been shown to emit " +
+                    "isoprene in some experiments and not in others.",
+            hidden = true
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
     @GetMapping(
             value = "/plants/mixed-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantDTO> getPlantsMixedEmitter(){
-        List<ResponsePlantDTO> plants = service.getMixedEmitters();
+        List<ResponsePlantDTO> plants = service.findAllPlantsMixedEmitters();
         if(plants.isEmpty()){
             throw new PlantNotFoundException("Plants mixed emitter not found.");
         }
@@ -458,6 +528,109 @@ public class PlantsVocController {
     }
 
 
+
+    /**
+     * Get list of plants isoprene emitters (always, never, mixed) by leaf-habitus and family
+     */
+    @Operation(
+            summary = "Search plants always, never, or mixed isoprene emitter by leaf-habitus and family.",
+            description = "This endpoint allows users to search for plants always emitter (plants that have " +
+                    "consistently reported emitting isoprene in experiments), never emitter " +
+                    "(plants that have never reported emitting isoprene in experiments), or " +
+                    "mixed emitter (i.e., plants that have been shown to emit isoprene in some experiments " +
+                    "and not in others) by leaf-habitus and family."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @GetMapping(
+            value = "/plants/emitters/leaf-habitus/family",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantDTO> getPlantsEmitterTypeByFamilyAndLeafHabitus(
+            @RequestParam(value="family") String family,
+            @RequestParam(value="leafHabitus") LeafHabitus leafHabitus,
+            @RequestParam(value="emitter") PlantsEmitterType emitter)
+    {
+        String familySanitized = StringUtils
+                .normalizeSpace(StringUtils
+                        .capitalize(family.toLowerCase()));
+        List<ResponsePlantDTO> plants = service.findAllPlantsEmitterTypeByFamilyAndLeafHabitus(
+                familySanitized,
+                leafHabitus,
+                emitter);
+        if (plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with family: {0}, leaf habitus: {1}, and emitter type: {2}",
+                    familySanitized,
+                    leafHabitus.name().toLowerCase(),
+                    emitter.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
+    }
+
+    /**
+     * Get list of plants isoprene emitters (always, never, mixed) by leaf-habitus and genus
+     */
+    @Operation(
+            summary = "Search plants always, never, or mixed isoprene emitter by leaf-habitus and genus.",
+            description = "This endpoint allows users to search for plants always emitter (plants that have " +
+                    "consistently reported emitting isoprene in experiments), never emitter " +
+                    "(plants that have never reported emitting isoprene in experiments), or " +
+                    "mixed emitter (i.e., plants that have been shown to emit isoprene in some experiments " +
+                    "and not in others) by leaf-habitus and genus."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @GetMapping(
+            value = "/plants/emitters/leaf-habitus/genus",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponsePlantDTO> getPlantsEmitterTypeByGenusAndLeafHabitus(
+            @RequestParam(value="genus") String genus,
+            @RequestParam(value = "leafHabitus") LeafHabitus leafHabitus,
+            @RequestParam(value="emitter") PlantsEmitterType emitter)
+    {
+        String genusSanitized = StringUtils
+                .normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
+        List<ResponsePlantDTO> plants = service.findAllPlantsEmitterTypeByGenusAndLeafHabitus(
+                genusSanitized,
+                leafHabitus,
+                emitter);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with family: {0}, leaf habitus: {1}, and emitter type: {2}",
+                    genusSanitized,
+                    leafHabitus.name().toLowerCase(),
+                    emitter.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
+    }
 
 
 
@@ -492,6 +665,9 @@ public class PlantsVocController {
      *
      * */
 
+    /**
+     * Delete plant by ID
+     */
     @Operation(
             summary = "Delete plant by ID.",
             description = "This endpoint allows users to delete a plant by ID."
@@ -508,15 +684,15 @@ public class PlantsVocController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
-    @DeleteMapping("/{id}")
+            )}
+    )
+    @DeleteMapping("/plants/id/{id}")
     public ResponseEntity<ResponsePlantDTO> deleteById(
             @PathVariable("id") UUID id
     ){
         Optional<ResponsePlantDTO> optionalResponsePlantDTO = service.findPlantById(id);
         if(optionalResponsePlantDTO.isPresent()){
-            service.delete(optionalResponsePlantDTO.get());
+            service.deleteById(optionalResponsePlantDTO.get());
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(optionalResponsePlantDTO.get());
@@ -527,4 +703,47 @@ public class PlantsVocController {
         }
     }
 
+    /**
+     * Delete plant by genius and species attributes.
+     */
+    @Operation(
+            summary = "Delete plant by genius and species attributes.",
+            description = "This endpoint allows users to delete a plant by genius and species attributes."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully deleted"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @DeleteMapping("/plants/species")
+    public ResponseEntity<ResponsePlantDTO> deleteBySpecies(
+            @RequestParam(value = "genus") String genus,
+            @RequestParam(value = "species") String species)
+    {
+        String genusSanitized = StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
+        String speciesSanitized = StringUtils.normalizeSpace(species.toLowerCase());
+        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service
+                .findPlantBySpecies(genusSanitized, speciesSanitized);
+        if(optionalResponsePlantDTO.isPresent()){
+            ResponsePlantDTO plant = optionalResponsePlantDTO.get();
+            service.deleteById(plant);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(plant);
+        } else {
+            throw new PlantNotFoundException(
+                    MessageFormat.format("Plant {0} {1} not found.",
+                            genusSanitized,
+                            speciesSanitized));
+        }
+    }
 }

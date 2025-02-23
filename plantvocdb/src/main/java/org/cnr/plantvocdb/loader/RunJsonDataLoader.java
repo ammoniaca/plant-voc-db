@@ -3,7 +3,7 @@ package org.cnr.plantvocdb.loader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cnr.plantvocdb.dto.RequestPlantDTO;
 import org.cnr.plantvocdb.entity.PlantEntity;
-import org.cnr.plantvocdb.repository.PlantsVocRepository;
+import org.cnr.plantvocdb.repository.PlantsRepository;
 import org.springframework.boot.CommandLineRunner;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.stereotype.Component;
@@ -24,11 +24,11 @@ import java.util.List;
 public class RunJsonDataLoader implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RunJsonDataLoader.class);
-    private final PlantsVocRepository repository;
+    private final PlantsRepository repository;
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper;
 
-    public RunJsonDataLoader(PlantsVocRepository repository, ObjectMapper mapper, ModelMapper modelMapper){
+    public RunJsonDataLoader(PlantsRepository repository, ObjectMapper mapper, ModelMapper modelMapper){
         this.repository = repository;
         this.objectMapper = mapper;
         this.modelMapper = modelMapper;

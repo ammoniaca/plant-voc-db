@@ -9,7 +9,7 @@ import org.cnr.plantvocdb.entity.PlantEntity;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsEmitterType;
 import org.cnr.plantvocdb.enums.PlantsRanks;
-import org.cnr.plantvocdb.repository.PlantsVocRepository;
+import org.cnr.plantvocdb.repository.PlantsRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,22 +22,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class PlantsVocService {
+public class PlantsService {
 
-    private final PlantsVocRepository repository;
+    private final PlantsRepository repository;
     private final ModelMapper mapper;
 
 
     @Autowired
-    public PlantsVocService(PlantsVocRepository repository,
-                            ModelMapper mapper) {
+    public PlantsService(PlantsRepository repository,
+                         ModelMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
 
     }
 
     public List<PlantInfoDTO> findAllPlantsInfo() {
-        List<ResponsePlantDTO> listPlantsDTO = getAllPlants();
+        List<ResponsePlantDTO> listPlantsDTO = findAllPlants();
         List<PlantInfoDTO> listPlantsInfo = new ArrayList<>();
         for (ResponsePlantDTO plant : listPlantsDTO) {
             OffsetDateTime createdAt = plant.getCreatedDatetimeUTC();
@@ -56,16 +56,25 @@ public class PlantsVocService {
         return listPlantsInfo;
     }
 
+    // GET
     public Optional<ResponsePlantDTO> findPlantById(UUID id) {
         Optional<PlantEntity> optionalPlantEntity = repository.findById(id);
         return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantDTO.class));
     }
 
+    // GET
     public Optional<ResponsePlantDTO> findPlantByIpni(String ipni){
         Optional<PlantEntity> optionalPlantEntity = repository.findByIpni(ipni);
         return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantDTO.class));
     }
 
+    // GET
+    public Optional<ResponsePlantDTO> findPlantBySpecies(String genus, String species) {
+        Optional<PlantEntity> optionalPlantEntity = repository.findByGenusAndSpecies(genus, species);
+        return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantDTO.class));
+    }
+
+    // GET
     public List<ResponsePlantDTO> findPlantsByName(String name){
         // sanitize name attribute (i.e., normalize space and lower case)
         return repository
@@ -76,6 +85,7 @@ public class PlantsVocService {
                 .toList();
     }
 
+    // GET
     public List<ResponsePlantDTO> findPlantsByFamily(String family){
         // sanitize family attribute (i.e., normalize space and Capitalized case)
         return repository
@@ -88,6 +98,7 @@ public class PlantsVocService {
                 .toList();
     }
 
+    // GET
     public List<ResponsePlantDTO> findPlantsByGenus(String genus){
         // sanitize genus attribute (i.e., normalize space and Capitalized case)
         return repository.findByGenus(StringUtils
@@ -99,6 +110,7 @@ public class PlantsVocService {
                 .toList();
     }
 
+    // GET
     public List<ResponsePlantDTO> findPlantsByRank(PlantsRanks rank){
         return repository.findByRank(rank)
                 .stream()
@@ -106,6 +118,7 @@ public class PlantsVocService {
                 .toList();
     }
 
+    // GET
     public List<ResponsePlantDTO> findPlantsByLeafHabitus(LeafHabitus leafHabitus){
         return repository
                 .findByLeafHabitus(leafHabitus)
@@ -114,9 +127,10 @@ public class PlantsVocService {
                 .toList();
     }
 
-    public List<ResponsePlantDTO> getAlwaysEmitters(){
+    // GET
+    public List<ResponsePlantDTO> findAllPlantsAlwaysEmitters(){
         List<ResponsePlantDTO> plants = new ArrayList<>();
-        for (ResponsePlantDTO plant : getAllPlants()) {
+        for (ResponsePlantDTO plant : findAllPlants()) {
             if(this.isAlwaysEmitter(plant)){
                 plants.add(plant);
             };
@@ -124,9 +138,10 @@ public class PlantsVocService {
         return plants;
     }
 
-    public List<ResponsePlantDTO> getNeverEmitters(){
+    // GET
+    public List<ResponsePlantDTO> findAllPlantsNeverEmitters(){
         List<ResponsePlantDTO> plants = new ArrayList<>();
-        for (ResponsePlantDTO plant : getAllPlants()) {
+        for (ResponsePlantDTO plant : findAllPlants()) {
             if(this.isNeverEmitter(plant)){
                 plants.add(plant);
             };
@@ -134,9 +149,10 @@ public class PlantsVocService {
         return plants;
     }
 
-    public List<ResponsePlantDTO> getMixedEmitters(){
+    // GET
+    public List<ResponsePlantDTO> findAllPlantsMixedEmitters(){
         List<ResponsePlantDTO> plants = new ArrayList<>();
-        for (ResponsePlantDTO plant : getAllPlants()) {
+        for (ResponsePlantDTO plant : findAllPlants()) {
             if(this.isMixedEmitter(plant)){
                 plants.add(plant);
             }
@@ -144,6 +160,27 @@ public class PlantsVocService {
         return plants;
     }
 
+    // GET
+    public List<ResponsePlantDTO> findAllPlantsEmitterTypeByFamilyAndLeafHabitus(
+            String family,
+            LeafHabitus leafHabitus,
+            PlantsEmitterType emitterFlag
+    ){
+        List<PlantEntity> listPlantsEntity = repository.findAllByFamilyIsAndLeafHabitus(family, leafHabitus);
+        return getPlantsByEmitterTyper(emitterFlag, listPlantsEntity);
+    }
+
+    // GET
+    public List<ResponsePlantDTO> findAllPlantsEmitterTypeByGenusAndLeafHabitus(
+            String genus,
+            LeafHabitus leafHabitus,
+            PlantsEmitterType emitterFlag)
+    {
+        List<PlantEntity> listPlantsEntity = repository.findAllByGenusAndLeafHabitus(genus, leafHabitus);
+        return getPlantsByEmitterTyper(emitterFlag, listPlantsEntity);
+    }
+
+    // POST
     public ResponsePlantDTO createPlantVoc(RequestPlantDTO plant){
 
         // map DTO to Entity
@@ -164,9 +201,28 @@ public class PlantsVocService {
         return mapper.map(savedPlantEntity, ResponsePlantDTO.class);
     }
 
-    public void delete(ResponsePlantDTO plant){
+    // DELETE
+    public void deleteById(ResponsePlantDTO plant){
         PlantEntity plantEntity = mapper.map(plant, PlantEntity.class);
         repository.deleteById(plantEntity.getId());
+    }
+
+    // PRIVATE METHODS
+    private List<ResponsePlantDTO> getPlantsByEmitterTyper(
+            PlantsEmitterType emitterFlag,
+            List<PlantEntity> listPlantsEntity
+    ){
+        List<ResponsePlantDTO> listPlantsDTO = new ArrayList<>();
+        if(!listPlantsEntity.isEmpty()){
+            for (PlantEntity plantEntity : listPlantsEntity) {
+                ResponsePlantDTO plantDTO = mapper.map(plantEntity, ResponsePlantDTO.class);
+                PlantsEmitterType emitterType = getEmitterType(plantDTO);
+                if(emitterType.equals(emitterFlag)){
+                    listPlantsDTO.add(plantDTO);
+                }
+            }
+        }
+        return listPlantsDTO;
     }
 
     private Boolean isAlwaysEmitter(ResponsePlantDTO plant){
@@ -212,7 +268,7 @@ public class PlantsVocService {
         return result;
     }
 
-    private List<ResponsePlantDTO> getAllPlants(){
+    private List<ResponsePlantDTO> findAllPlants(){
         return repository
                 .findAll()
                 .stream()

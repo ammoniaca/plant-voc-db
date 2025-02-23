@@ -53,13 +53,19 @@ public class OpenAPIConfig {
 //        return new OpenAPI().info(information).servers(List.of(server));
         return new OpenAPI()
                 .info(new Info()
-                        .title("Spring Boot API")
+                        .title("Plant isoprene database")
+                        .version("1.0.0")
+                        .license(new License()
+                                .name("MIT License")
+                                .url("https://choosealicense.com/licenses/mit/")
+                        )
                         .description("""
-                        ## Authors
-                        - **Maria Ivagnes** - Institute for Sustainable Plant Protection (IPSP) of CNR
-                        - **Alessandro Montaghi** -  Institute for BioEconomy (IBE) of CNR
-                        - **Silvia Fineschi** - 
-                        - **Francesco Loreto** - University of Naples Federico 
+                        This API exposes endpoints to manage the plant isoprene database.
+                        ### Authors
+                        - **Maria Ivagnes** - Institute for Sustainable Plant Protection (IPSP) of CNR, Italy
+                        - **Alessandro Montaghi** -  Institute for BioEconomy (IBE) of CNR, Italy
+                        - **Silvia Fineschi** - Institute for Sustainable Plant Protection (IPSP) of CNR, Italy
+                        - **Francesco Loreto** - University of Naples Federico, Italy 
                         """)
                         .version("1.0")
                         .contact(new Contact()

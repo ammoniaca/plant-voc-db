@@ -11,10 +11,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface PlantsVocRepository
+public interface PlantsRepository
         extends JpaRepository<PlantEntity, UUID> {
 
     Optional<PlantEntity> findByIpni(String ipni);
+
+    Optional<PlantEntity> findByGenusAndSpecies(String genus, String species);
 
     List<PlantEntity> findByName(String name);
 
@@ -25,5 +27,12 @@ public interface PlantsVocRepository
     List<PlantEntity> findByRank(PlantsRanks rank);
 
     List<PlantEntity> findByLeafHabitus(LeafHabitus leafHabitus);
+
+    List<PlantEntity> findAllByFamilyIsAndLeafHabitus(String family, LeafHabitus leafHabitus);
+
+    List<PlantEntity> findAllByGenusAndLeafHabitus(String genus, LeafHabitus leafHabitus);
+
+    void deleteByGenusAndSpecies(String genus, String species);
+
 
 }
