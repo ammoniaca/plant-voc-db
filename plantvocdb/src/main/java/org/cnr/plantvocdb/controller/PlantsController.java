@@ -34,12 +34,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/isoprene")
 @Tag(name = "Plant isoprene APIs")
-public class PlantsVocController {
+public class PlantsController {
 
     private final PlantsService service;
 
     @Autowired
-    public PlantsVocController(PlantsService service) {
+    public PlantsController(PlantsService service) {
 
         this.service = service;
     }
