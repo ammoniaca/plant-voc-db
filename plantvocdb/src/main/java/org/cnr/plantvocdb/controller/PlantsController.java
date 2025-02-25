@@ -142,8 +142,9 @@ public class PlantsController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @Tag(name = "HOLA")
     @GetMapping(
             value = "/plants/ipni/{ipni}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -270,8 +271,9 @@ public class PlantsController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @Tag(name = "HOLA")
     @GetMapping(
             value = "/plants/families/{family}",
             produces = MediaType.APPLICATION_JSON_VALUE
