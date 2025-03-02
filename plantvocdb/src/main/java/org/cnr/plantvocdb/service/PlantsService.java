@@ -5,15 +5,18 @@ import org.cnr.plantvocdb.dto.PlantEmitterDTO;
 import org.cnr.plantvocdb.dto.PlantInfoDTO;
 import org.cnr.plantvocdb.dto.RequestPlantDTO;
 import org.cnr.plantvocdb.dto.ResponsePlantDTO;
+import org.cnr.plantvocdb.entity.PlantEmitterEntity;
 import org.cnr.plantvocdb.entity.PlantEntity;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsEmitterType;
 import org.cnr.plantvocdb.enums.PlantsRanks;
+import org.cnr.plantvocdb.exceptions.PlantNotFoundException;
 import org.cnr.plantvocdb.repository.PlantsRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -36,6 +39,7 @@ public class PlantsService {
 
     }
 
+    // GET
     public List<PlantInfoDTO> findAllPlantsInfo() {
         List<ResponsePlantDTO> listPlantsDTO = findAllPlants();
         List<PlantInfoDTO> listPlantsInfo = new ArrayList<>();
@@ -57,29 +61,57 @@ public class PlantsService {
     }
 
     // GET
-    public Optional<ResponsePlantDTO> findPlantById(UUID id) {
+    public ResponsePlantDTO findPlantById(UUID id) {
         Optional<PlantEntity> optionalPlantEntity = repository.findById(id);
-        return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantDTO.class));
+        if (optionalPlantEntity.isEmpty()) {
+            String errorMessage = MessageFormat.format("Plant with id {0} not found.", id.toString());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        PlantEntity plantEntity = optionalPlantEntity.get();
+        return mapper.map(plantEntity, ResponsePlantDTO.class);
     }
 
     // GET
-    public Optional<ResponsePlantDTO> findPlantByIpni(String ipni){
+    public ResponsePlantDTO findPlantByIpni(String ipni){
         Optional<PlantEntity> optionalPlantEntity = repository.findByIpni(ipni);
-        return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantDTO.class));
-    }
+        if (optionalPlantEntity.isEmpty()) {
+            String errorMessage = MessageFormat.format("Plant with ipni {0} not found.", ipni);
+            throw new PlantNotFoundException(errorMessage);
+        }
+        PlantEntity plantEntity = optionalPlantEntity.get();
+        return mapper.map(plantEntity, ResponsePlantDTO.class);
+  }
 
     // GET
-    public Optional<ResponsePlantDTO> findPlantBySpecies(String genus, String species) {
-        Optional<PlantEntity> optionalPlantEntity = repository.findByGenusAndSpecies(genus, species);
-        return optionalPlantEntity.map(it -> mapper.map(it, ResponsePlantDTO.class));
+    public ResponsePlantDTO findPlantBySpecies(String genus, String species) {
+        String genusSanitized = StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
+        String speciesSanitized = StringUtils.normalizeSpace(species.toLowerCase());
+        Optional<PlantEntity> optionalPlantEntity = repository.findByGenusAndSpecies(
+                genusSanitized,
+                speciesSanitized
+        );
+        if(optionalPlantEntity.isEmpty()){
+            String errorMessage = MessageFormat.format("Plant {0} {1} not found.",
+                    genusSanitized,
+                    speciesSanitized
+            );
+            throw new PlantNotFoundException(errorMessage);
+        }
+        PlantEntity plantEntity = optionalPlantEntity.get();
+        return mapper.map(plantEntity, ResponsePlantDTO.class);
     }
 
     // GET
     public List<ResponsePlantDTO> findPlantsByName(String name){
         // sanitize name attribute (i.e., normalize space and lower case)
-        return repository
-                .findByName(StringUtils
-                        .normalizeSpace(name.toLowerCase()))
+        String nameSanitized = StringUtils.normalizeSpace(name.toLowerCase());
+        List<PlantEntity> plantEntities = repository.findByName(nameSanitized);
+        // check if list is empty
+        if(plantEntities.isEmpty()){
+            String errorMessage = MessageFormat.format("Plants not found with name: {0}.", nameSanitized);
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plantEntities
                 .stream()
                 .map(it -> mapper.map(it, ResponsePlantDTO.class))
                 .toList();
@@ -88,11 +120,14 @@ public class PlantsService {
     // GET
     public List<ResponsePlantDTO> findPlantsByFamily(String family){
         // sanitize family attribute (i.e., normalize space and Capitalized case)
-        return repository
-                .findByFamily(StringUtils
-                        .normalizeSpace(StringUtils
-                                .capitalize(family
-                                        .toLowerCase())))
+        String familySanitized = StringUtils.normalizeSpace(StringUtils.capitalize(family.toLowerCase()));
+        List<PlantEntity> plantEntities = repository.findByFamily(familySanitized);
+        if(plantEntities.isEmpty()){
+            String errorMessage = MessageFormat
+                    .format("Plants not found with family: {0}.", familySanitized);
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plantEntities
                 .stream()
                 .map(it -> mapper.map(it, ResponsePlantDTO.class))
                 .toList();
@@ -101,18 +136,27 @@ public class PlantsService {
     // GET
     public List<ResponsePlantDTO> findPlantsByGenus(String genus){
         // sanitize genus attribute (i.e., normalize space and Capitalized case)
-        return repository.findByGenus(StringUtils
-                        .normalizeSpace(StringUtils
-                                .capitalize(genus
-                                        .toLowerCase())))
-                .stream()
+        String genusSanitized = StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
+        List<PlantEntity> plantEntities = repository.findByGenus(genusSanitized);
+        if(plantEntities.isEmpty()){
+            String errorMessage = MessageFormat.format("Plants not found with genus: {0}.", genusSanitized);
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plantEntities.stream()
                 .map(it -> mapper.map(it, ResponsePlantDTO.class))
                 .toList();
     }
 
     // GET
     public List<ResponsePlantDTO> findPlantsByRank(PlantsRanks rank){
-        return repository.findByRank(rank)
+        List<PlantEntity> plantEntities = repository.findByRank(rank);
+        if(plantEntities.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with rank: {0}.",
+                    rank.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plantEntities
                 .stream()
                 .map(it -> mapper.map(it, ResponsePlantDTO.class))
                 .toList();
@@ -120,8 +164,14 @@ public class PlantsService {
 
     // GET
     public List<ResponsePlantDTO> findPlantsByLeafHabitus(LeafHabitus leafHabitus){
-        return repository
-                .findByLeafHabitus(leafHabitus)
+        List<PlantEntity> plantEntities = repository.findByLeafHabitus(leafHabitus);
+        if(plantEntities.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with leaf habitus: {0}.",
+                    leafHabitus.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plantEntities
                 .stream()
                 .map(it -> mapper.map(it, ResponsePlantDTO.class))
                 .toList();
@@ -135,6 +185,9 @@ public class PlantsService {
                 plants.add(plant);
             };
         }
+        if (plants.isEmpty()) {
+            throw new PlantNotFoundException("Always emitter plants not found.");
+        }
         return plants;
     }
 
@@ -145,6 +198,9 @@ public class PlantsService {
             if(this.isNeverEmitter(plant)){
                 plants.add(plant);
             };
+        }
+        if(plants.isEmpty()) {
+            throw new PlantNotFoundException("Never emitter plants not found.");
         }
         return plants;
     }
@@ -157,13 +213,22 @@ public class PlantsService {
                 plants.add(plant);
             }
         };
+        if(plants.isEmpty()) {
+            throw new PlantNotFoundException("Mixed emitter plants not found.");
+        }
         return plants;
     }
 
     // GET
     public List<ResponsePlantDTO> findAllPlantsEmitters(PlantsEmitterType emitterFlag){
-        List<PlantEntity> listPlantsEntity = repository.findAll();
-        return getPlantsByEmitterTyper(emitterFlag, listPlantsEntity);
+        List<PlantEntity> plantEntities = repository.findAll();
+        List<ResponsePlantDTO> plants = getPlantsByEmitterTyper(emitterFlag, plantEntities);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat
+                    .format("Plants {0} emitter not found.", emitterFlag.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
     }
 
     // GET
@@ -172,8 +237,18 @@ public class PlantsService {
             LeafHabitus leafHabitus,
             PlantsEmitterType emitterFlag
     ){
-        List<PlantEntity> listPlantsEntity = repository.findAllByFamilyIsAndLeafHabitus(family, leafHabitus);
-        return getPlantsByEmitterTyper(emitterFlag, listPlantsEntity);
+        String familySanitized = StringUtils.normalizeSpace(StringUtils.capitalize(family.toLowerCase()));
+        List<PlantEntity> plantEntities = repository.findAllByFamilyIsAndLeafHabitus(familySanitized, leafHabitus);
+        List<ResponsePlantDTO> plants = getPlantsByEmitterTyper(emitterFlag, plantEntities);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with family: {0}, leaf habitus: {1}, and emitter type: {2}.",
+                    familySanitized,
+                    leafHabitus.name().toLowerCase(),
+                    emitterFlag.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
     }
 
     // GET
@@ -182,12 +257,22 @@ public class PlantsService {
             LeafHabitus leafHabitus,
             PlantsEmitterType emitterFlag)
     {
-        List<PlantEntity> listPlantsEntity = repository.findAllByGenusAndLeafHabitus(genus, leafHabitus);
-        return getPlantsByEmitterTyper(emitterFlag, listPlantsEntity);
+        String genusSanitized = StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
+        List<PlantEntity> plantEntities = repository.findAllByGenusAndLeafHabitus(genusSanitized, leafHabitus);
+        List<ResponsePlantDTO> plants = getPlantsByEmitterTyper(emitterFlag, plantEntities);
+        if(plants.isEmpty()){
+            String errorMessage = MessageFormat.format(
+                    "Plants not found with family: {0}, leaf habitus: {1}, and emitter type: {2}.",
+                    genusSanitized,
+                    leafHabitus.name().toLowerCase(),
+                    emitterFlag.name().toLowerCase());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        return plants;
     }
 
     // POST
-    public ResponsePlantDTO createPlantVoc(RequestPlantDTO plant){
+    public ResponsePlantDTO createPlant(RequestPlantDTO plant){
 
         // map DTO to Entity
         PlantEntity plantEntity = mapper.map(plant, PlantEntity.class);
@@ -211,6 +296,33 @@ public class PlantsService {
     public void deleteById(ResponsePlantDTO plant){
         PlantEntity plantEntity = mapper.map(plant, PlantEntity.class);
         repository.deleteById(plantEntity.getId());
+    }
+
+    // PUT
+    public ResponsePlantDTO addEmitter(
+            UUID id,
+            boolean emits,
+            String doi
+    ){
+        Optional<PlantEntity> optionalPlant = repository.findById(id);
+        if (optionalPlant.isEmpty()) {
+            String errorMessage = MessageFormat.format("Plant with id {0} not found.", id.toString());
+            throw new PlantNotFoundException(errorMessage);
+        }
+        PlantEntity plantEntity = optionalPlant.get();
+        // update date
+        plantEntity.setUpdatedDatetimeUTC(OffsetDateTime.now(ZoneOffset.UTC));
+        // Add the new emitter to the list
+        plantEntity.getEmitter().add(PlantEmitterEntity
+                .builder()
+                .emits(emits)
+                .plant(plantEntity) // Associate it with the existing plant
+                .doi(doi)
+                .build()
+        );
+        PlantEntity updatedPlantEntity = repository.save(plantEntity);
+        // Convert back to DTO and return
+        return mapper.map(updatedPlantEntity, ResponsePlantDTO.class);
     }
 
     // PRIVATE METHODS

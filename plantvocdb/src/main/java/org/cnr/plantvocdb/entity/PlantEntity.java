@@ -1,6 +1,7 @@
 package org.cnr.plantvocdb.entity;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ import org.cnr.plantvocdb.enums.PlantsRanks;
 @Builder
 @Getter
 @Setter
-@Table(name = "plants_voc")
+@Table(name = "plants")
 public class PlantEntity {
 
     @Id
@@ -68,7 +69,7 @@ public class PlantEntity {
             orphanRemoval = true,  // Ensures childs are deleted when plant is deleted
             mappedBy = "plant"
     )
-    private Set<PlantEmitterEntity> emitter;
+    private List<PlantEmitterEntity> emitter;
 
     @ElementCollection
     @CollectionTable(

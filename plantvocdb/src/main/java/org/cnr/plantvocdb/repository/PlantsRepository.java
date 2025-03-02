@@ -32,7 +32,6 @@ public interface PlantsRepository
 
     List<PlantEntity> findAllByGenusAndLeafHabitus(String genus, LeafHabitus leafHabitus);
 
-    void deleteByGenusAndSpecies(String genus, String species);
 
 
 }

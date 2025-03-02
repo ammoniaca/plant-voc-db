@@ -28,12 +28,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/isoprene")
-@Tag(name = "Plant isoprene APIs")
+//@Tag(name = "Plant isoprene APIs")
 public class PlantsController {
 
     private final PlantsService service;
@@ -69,13 +68,14 @@ public class PlantsController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public List<PlantInfoDTO> getPlantsVocInfo(){
+    public List<PlantInfoDTO> getPlantsInfo(){
         List<PlantInfoDTO> plantInfos = service.findAllPlantsInfo();
         if(plantInfos.isEmpty()){
             throw new PlantNotFoundException("Plants not found.");
@@ -102,8 +102,9 @@ public class PlantsController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/id/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -112,14 +113,10 @@ public class PlantsController {
             @Valid
             @PathVariable("id") UUID plantId
     ){
-        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service.findPlantById(plantId);
-        return optionalResponsePlantDTO.map(
-                responsePlantVocDTO -> ResponseEntity
+        ResponsePlantDTO plant = service.findPlantById(plantId);
+        return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(responsePlantVocDTO))
-                .orElseThrow(() -> new PlantNotFoundException(
-                        MessageFormat.format("Plant not found with id: {0}.", plantId.toString()))
-                );
+                .body(plant);
     }
 
     /**
@@ -144,7 +141,7 @@ public class PlantsController {
                     )
             )}
     )
-    @Tag(name = "HOLA")
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/ipni/{ipni}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -152,16 +149,11 @@ public class PlantsController {
     public ResponseEntity<ResponsePlantDTO> getPlantByIpni(
             @PathVariable("ipni") String ipni
     ){
-        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service.findPlantByIpni(ipni);
-        return optionalResponsePlantDTO.map(
-                        responsePlantVocDTO -> ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(responsePlantVocDTO))
-                .orElseThrow(() -> new PlantNotFoundException(
-                        MessageFormat.format("Plant not found with ipni code: {0}.", ipni))
-                );
+        ResponsePlantDTO plant = service.findPlantByIpni(ipni);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(plant);
     }
-
 
     /**
      * Get a plant genus and species attributes.
@@ -183,8 +175,9 @@ public class PlantsController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/species",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -193,22 +186,10 @@ public class PlantsController {
             @RequestParam(value = "genus") String genus,
             @RequestParam(value = "species") String species)
     {
-        String genusSanitized = StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
-        String speciesSanitized = StringUtils.normalizeSpace(species.toLowerCase());
-        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service
-                .findPlantBySpecies(
-                        genusSanitized,
-                        speciesSanitized
-                );
-        return optionalResponsePlantDTO.map(
-                        responsePlantVocDTO -> ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(responsePlantVocDTO))
-                .orElseThrow(() -> new PlantNotFoundException(
-                        MessageFormat.format("Plant {0} {1} not found.",
-                                genusSanitized,
-                                speciesSanitized))
-                );
+        ResponsePlantDTO plant = service.findPlantBySpecies(genus, species);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(plant);
     }
 
     /**
@@ -230,8 +211,9 @@ public class PlantsController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/names/{name}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -240,13 +222,7 @@ public class PlantsController {
             @Valid
             @PathVariable("name") String name
     ){
-        List<ResponsePlantDTO> plants = service.findPlantsByName(name);
-        if(plants.isEmpty()){
-            String errorMessage = MessageFormat.format("Plants not found with name: {0}.",
-                    StringUtils.normalizeSpace(name.toLowerCase()));
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
+        return service.findPlantsByName(name);
     }
 
     /**
@@ -273,7 +249,7 @@ public class PlantsController {
                     )
             )}
     )
-    @Tag(name = "HOLA")
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/families/{family}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -282,17 +258,7 @@ public class PlantsController {
             @Valid
             @PathVariable("family") String family
     ){
-        String familySanitized = StringUtils
-                .normalizeSpace(StringUtils
-                        .capitalize(family.toLowerCase()));
-        List<ResponsePlantDTO> plants = service.findPlantsByFamily(familySanitized);
-        if(plants.isEmpty()){
-            String errorMessage = MessageFormat
-                    .format("Plants not found with family: {0}.", familySanitized);
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
-
+        return service.findPlantsByFamily(family);
     }
 
     /**
@@ -317,8 +283,9 @@ public class PlantsController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDTO.class)
                     )
-            )
-    })
+            )}
+    )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/genera/{genus}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -327,15 +294,7 @@ public class PlantsController {
             @Valid
             @PathVariable("genus") String genus
     ){
-        String genusSanitized = StringUtils
-                .normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
-        List<ResponsePlantDTO> plants = service.findPlantsByGenus(genusSanitized);
-        if(plants.isEmpty()){
-            String errorMessage = MessageFormat
-                    .format("Plants not found with genus: {0}.", genusSanitized);
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
+        return service.findPlantsByGenus(genus);
     }
 
     /**
@@ -363,6 +322,7 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/ranks/{rank}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -371,14 +331,7 @@ public class PlantsController {
             @Valid
             @PathVariable("rank") PlantsRanks rank
     ){
-        List<ResponsePlantDTO> plants = service.findPlantsByRank(rank);
-        if (plants.isEmpty()){
-            String errorMessage = MessageFormat.format(
-                    "Plants not found with rank: {0}.",
-                    rank.name().toLowerCase());
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
+        return service.findPlantsByRank(rank);
     }
 
     /**
@@ -406,6 +359,7 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/leaf-habitus/{leaf-habitus}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -414,14 +368,7 @@ public class PlantsController {
             @Valid
             @PathVariable("leaf-habitus") LeafHabitus leafHabitus
     ){
-        List<ResponsePlantDTO> plants = service.findPlantsByLeafHabitus(leafHabitus);
-        if(plants.isEmpty()){
-            String errorMessage = MessageFormat.format(
-                    "Plants not found with leaf habitus: {0}.",
-                    leafHabitus.name().toLowerCase());
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
+        return service.findPlantsByLeafHabitus(leafHabitus);
     }
 
     /**
@@ -447,16 +394,13 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/always-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantDTO> getPlantsAlwaysEmitter(){
-        List<ResponsePlantDTO> plants = service.findAllPlantsAlwaysEmitters();
-        if(plants.isEmpty()){
-            throw new PlantNotFoundException("Plants always emitter not found.");
-        }
-        return plants;
+        return service.findAllPlantsAlwaysEmitters();
     }
 
     /**
@@ -482,16 +426,13 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/never-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantDTO> getPlantsNeverEmitter(){
-        List<ResponsePlantDTO> plants = service.findAllPlantsNeverEmitters();
-        if(plants.isEmpty()){
-            throw new PlantNotFoundException("Plants never emitter not found.");
-        }
-        return plants;
+        return service.findAllPlantsNeverEmitters();
     }
 
     /**
@@ -517,16 +458,13 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/mixed-emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<ResponsePlantDTO> getPlantsMixedEmitter(){
-        List<ResponsePlantDTO> plants = service.findAllPlantsMixedEmitters();
-        if(plants.isEmpty()){
-            throw new PlantNotFoundException("Plants mixed emitter not found.");
-        }
-        return plants;
+        return service.findAllPlantsMixedEmitters();
     }
 
     /**
@@ -554,6 +492,7 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/emitters",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -561,13 +500,7 @@ public class PlantsController {
     public List<ResponsePlantDTO> getEmitters(
             @RequestParam(value="emitter") PlantsEmitterType emitter
     ){
-        List<ResponsePlantDTO> plants = service.findAllPlantsEmitters(emitter);
-        if(plants.isEmpty()){
-            String errorMessage = MessageFormat
-                    .format("Plants {0} emitter not found.", emitter.name().toLowerCase());
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
+        return service.findAllPlantsEmitters(emitter);
     }
 
     /**
@@ -595,6 +528,7 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/emitters/leaf-habitus/family",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -604,22 +538,10 @@ public class PlantsController {
             @RequestParam(value="leafHabitus") LeafHabitus leafHabitus,
             @RequestParam(value="emitter") PlantsEmitterType emitter)
     {
-        String familySanitized = StringUtils
-                .normalizeSpace(StringUtils
-                        .capitalize(family.toLowerCase()));
-        List<ResponsePlantDTO> plants = service.findAllPlantsEmitterTypeByFamilyAndLeafHabitus(
-                familySanitized,
+        return service.findAllPlantsEmitterTypeByFamilyAndLeafHabitus(
+                family,
                 leafHabitus,
                 emitter);
-        if (plants.isEmpty()){
-            String errorMessage = MessageFormat.format(
-                    "Plants not found with family: {0}, leaf habitus: {1}, and emitter type: {2}",
-                    familySanitized,
-                    leafHabitus.name().toLowerCase(),
-                    emitter.name().toLowerCase());
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
     }
 
     /**
@@ -647,6 +569,7 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for retrieving data")
     @GetMapping(
             value = "/plants/emitters/leaf-habitus/genus",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -656,23 +579,11 @@ public class PlantsController {
             @RequestParam(value = "leafHabitus") LeafHabitus leafHabitus,
             @RequestParam(value="emitter") PlantsEmitterType emitter)
     {
-        String genusSanitized = StringUtils
-                .normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
-        List<ResponsePlantDTO> plants = service.findAllPlantsEmitterTypeByGenusAndLeafHabitus(
-                genusSanitized,
+        return service.findAllPlantsEmitterTypeByGenusAndLeafHabitus(
+                genus,
                 leafHabitus,
                 emitter);
-        if(plants.isEmpty()){
-            String errorMessage = MessageFormat.format(
-                    "Plants not found with family: {0}, leaf habitus: {1}, and emitter type: {2}",
-                    genusSanitized,
-                    leafHabitus.name().toLowerCase(),
-                    emitter.name().toLowerCase());
-            throw new PlantNotFoundException(errorMessage);
-        }
-        return plants;
     }
-
 
 
     /*
@@ -682,22 +593,77 @@ public class PlantsController {
     * */
 
     /**
-     * Post a single new plants isoprene
+     * Post a single new plant
      */
+    @Operation(
+            summary = "Create a new plant.",
+            description = ""
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201 ",
+                    description = "Created",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponsePlantDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @Tag(name = "Collection of methods used for creating data")
     @PostMapping(
             value = "/plants",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> postNewPlant(
+    public ResponseEntity<ResponsePlantDTO> postNewPlant(
             @RequestBody
             @Valid
             RequestPlantDTO plantDTO
     ){
-        ResponsePlantDTO newPlant = service.createPlantVoc(plantDTO);
+        ResponsePlantDTO newPlant = service.createPlant(plantDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(newPlant);
+    }
+
+    /**
+     * Add a new emitter
+     */
+    @Operation(
+            summary = "Add a new isoprene emission evaluation to an existing plant.",
+            description = ""
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully entry"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )}
+    )
+    @Tag(name = "Collection of methods used for creating data")
+    @PostMapping("/plants/emitter")
+    public ResponseEntity<ResponsePlantDTO> addEmitterById(
+            @RequestParam(value = "id") UUID id,
+            @RequestParam(value = "emits") boolean emits,
+            @RequestParam(value = "doi") String doi
+    ){
+        ResponsePlantDTO updatedPlant = service.addEmitter(id, emits, doi);
+        return ResponseEntity.ok(updatedPlant);
     }
 
     /*
@@ -727,29 +693,23 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for deleting data")
     @DeleteMapping("/plants/id/{id}")
     public ResponseEntity<ResponsePlantDTO> deleteById(
-            @PathVariable("id") UUID id
-    ){
-        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service.findPlantById(id);
-        if(optionalResponsePlantDTO.isPresent()){
-            service.deleteById(optionalResponsePlantDTO.get());
-            return ResponseEntity
+            @PathVariable("id") UUID id)
+    {
+        ResponsePlantDTO plant = service.findPlantById(id);
+        return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(optionalResponsePlantDTO.get());
-        } else {
-            throw new PlantNotFoundException(
-                    MessageFormat.format("Plant not found with id: {0}.", id.toString())
-            );
-        }
+                    .body(plant);
     }
 
     /**
      * Delete plant by genius and species attributes.
      */
     @Operation(
-            summary = "Delete plant by genius and species attributes.",
-            description = "This endpoint allows users to delete a plant by genius and species attributes."
+            summary = "Delete plant by genus and species attributes.",
+            description = "This endpoint allows users to delete a plant by genus and species attributes."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -765,26 +725,26 @@ public class PlantsController {
                     )
             )}
     )
+    @Tag(name = "Collection of methods used for deleting data")
     @DeleteMapping("/plants/species")
     public ResponseEntity<ResponsePlantDTO> deleteBySpecies(
             @RequestParam(value = "genus") String genus,
             @RequestParam(value = "species") String species)
     {
-        String genusSanitized = StringUtils.normalizeSpace(StringUtils.capitalize(genus.toLowerCase()));
-        String speciesSanitized = StringUtils.normalizeSpace(species.toLowerCase());
-        Optional<ResponsePlantDTO> optionalResponsePlantDTO = service
-                .findPlantBySpecies(genusSanitized, speciesSanitized);
-        if(optionalResponsePlantDTO.isPresent()){
-            ResponsePlantDTO plant = optionalResponsePlantDTO.get();
-            service.deleteById(plant);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(plant);
-        } else {
-            throw new PlantNotFoundException(
-                    MessageFormat.format("Plant {0} {1} not found.",
-                            genusSanitized,
-                            speciesSanitized));
-        }
+        ResponsePlantDTO plant = service.findPlantBySpecies(genus, species);
+        service.deleteById(plant);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(plant);
     }
+
+    /*
+     *
+     * Endpoints UPDATE
+     *
+     * */
+    //@Tag(name = "Collection of methods used for updating data")
+
+
+
 }
