@@ -6,6 +6,7 @@ import lombok.*;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsRanks;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -51,7 +52,7 @@ public class RequestPlantDTO {
     private Set<String> synonyms;
 
     @JsonProperty("emitter")
-    private Set<PlantEmitterDTO> emitter;
+    private List<PlantEmitterDTO> emitter;
 
 
 }

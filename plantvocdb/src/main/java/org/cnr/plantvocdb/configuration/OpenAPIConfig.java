@@ -62,10 +62,10 @@ public class OpenAPIConfig {
                         .description("""
                         This API exposes endpoints to manage the plant isoprene database.
                         ### Authors
-                        - **Maria Ivagnes** - Institute for Sustainable Plant Protection (IPSP) of CNR, Italy
-                        - **Alessandro Montaghi** -  Institute for BioEconomy (IBE) of CNR, Italy
-                        - **Silvia Fineschi** - Institute for Sustainable Plant Protection (IPSP) of CNR, Italy
-                        - **Francesco Loreto** - University of Naples Federico, Italy 
+                        - **Maria Ivagnes** - Institute for Sustainable Plant Protection (IPSP) of the National Research Council (CNR), Italy
+                        - **Alessandro Montaghi** -  Institute for BioEconomy (IBE) of the National Research Council (CNR), Italy
+                        - **Silvia Fineschi** - Institute for Sustainable Plant Protection (IPSP) of the National Research Council (CNR), Italy
+                        - **Francesco Loreto** - Department of Biology ot the University of Naples Federico II, Italy
                         """)
                         .version("1.0")
                         .contact(new Contact()

@@ -647,6 +647,14 @@ public class PlantsController {
                     description = "Successfully entry"
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "Not found",
                     content = @Content(

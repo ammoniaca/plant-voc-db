@@ -16,28 +16,46 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PlantNotFoundException.class)
     public ResponseEntity<?> handlePlantNotFoundException(
-            PlantNotFoundException exception,
+            PlantNotFoundException ex,
             WebRequest request
     ) {
-        String path = request
-                .getDescription(false)
-                .replace("uri=", "");
-
         ErrorResponseDTO plantNotFound = ErrorResponseDTO
-              .builder()
-              .timestamp(LocalDateTime.now())
-              .status(HttpStatus.NOT_FOUND.value())
-              .details(exception.getMessage())
-              .message(HttpStatus.NOT_FOUND.name()).instance(path)
-              .build();
+                .builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .details(ex.getMessage())
+                .message(HttpStatus.NOT_FOUND.name())
+                .instance(getPath(request))
+                .build();
 
       return ResponseEntity
               .status(HttpStatus.NOT_FOUND)
               .body(plantNotFound);
     }
 
+    @ExceptionHandler(DoiNotValidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDoiNotFoundException(
+            DoiNotValidException ex,
+            WebRequest request
+    ) {
+        ErrorResponseDTO doiNotValid = ErrorResponseDTO
+                .builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .details(ex.getMessage())
+                .message(HttpStatus.BAD_REQUEST.name())
+                .instance(getPath(request))
+                .build();
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(doiNotValid);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponseDTO> handleValidationException(HttpMessageNotReadableException exception) {
+    public ResponseEntity<ErrorResponseDTO> handleValidationException(
+            HttpMessageNotReadableException exception)
+    {
         String errorDetails = "";
 
         if (exception.getCause() instanceof InvalidFormatException) {
@@ -53,6 +71,12 @@ public class GlobalExceptionHandler {
                 .details(errorDetails)
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    private String getPath(WebRequest request){
+        return request
+                .getDescription(false)
+                .replace("uri=", "");
     }
 
 }

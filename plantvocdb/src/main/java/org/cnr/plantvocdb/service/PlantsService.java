@@ -10,6 +10,7 @@ import org.cnr.plantvocdb.entity.PlantEntity;
 import org.cnr.plantvocdb.enums.LeafHabitus;
 import org.cnr.plantvocdb.enums.PlantsEmitterType;
 import org.cnr.plantvocdb.enums.PlantsRanks;
+import org.cnr.plantvocdb.exceptions.DoiNotValidException;
 import org.cnr.plantvocdb.exceptions.PlantNotFoundException;
 import org.cnr.plantvocdb.repository.PlantsRepository;
 import org.modelmapper.ModelMapper;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.cnr.plantvocdb.util.DoiValidator.isValidDoi;
 
 @Service
 public class PlantsService {
@@ -272,7 +275,17 @@ public class PlantsService {
     }
 
     // POST
-    public ResponsePlantDTO createPlant(RequestPlantDTO plant){
+    public ResponsePlantDTO createPlant(
+            RequestPlantDTO plant)
+    {
+        // check if DOI is valid
+        List<PlantEmitterDTO> emitters = plant.getEmitter();
+        for(PlantEmitterDTO emitter : emitters){
+            if(!isValidDoi(emitter.getDoi())){
+                String errorMessage = MessageFormat.format("Doi {0} is not a valid doi.", emitter.getDoi());
+                throw new DoiNotValidException(errorMessage);
+            }
+        }
 
         // map DTO to Entity
         PlantEntity plantEntity = mapper.map(plant, PlantEntity.class);
@@ -292,24 +305,24 @@ public class PlantsService {
         return mapper.map(savedPlantEntity, ResponsePlantDTO.class);
     }
 
-    // DELETE
-    public void deleteById(ResponsePlantDTO plant){
-        PlantEntity plantEntity = mapper.map(plant, PlantEntity.class);
-        repository.deleteById(plantEntity.getId());
-    }
-
     // PUT
     public ResponsePlantDTO addEmitter(
             UUID id,
             boolean emits,
             String doi
     ){
+        // check if Doi is
+        if(!isValidDoi(doi)){
+            String errorMessage = MessageFormat.format("Doi {0} is not a valid doi.", doi);
+            throw new DoiNotValidException(errorMessage);
+        }
         Optional<PlantEntity> optionalPlant = repository.findById(id);
         if (optionalPlant.isEmpty()) {
             String errorMessage = MessageFormat.format("Plant with id {0} not found.", id.toString());
             throw new PlantNotFoundException(errorMessage);
         }
         PlantEntity plantEntity = optionalPlant.get();
+
         // update date
         plantEntity.setUpdatedDatetimeUTC(OffsetDateTime.now(ZoneOffset.UTC));
         // Add the new emitter to the list
@@ -323,6 +336,12 @@ public class PlantsService {
         PlantEntity updatedPlantEntity = repository.save(plantEntity);
         // Convert back to DTO and return
         return mapper.map(updatedPlantEntity, ResponsePlantDTO.class);
+    }
+
+    // DELETE
+    public void deleteById(ResponsePlantDTO plant){
+        PlantEntity plantEntity = mapper.map(plant, PlantEntity.class);
+        repository.deleteById(plantEntity.getId());
     }
 
     // PRIVATE METHODS
